@@ -329,21 +329,21 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
         </div>
       )}
 
-      {/* Customer's Complaint History & SLA Tracker */}
+      {/* Customer's Complaint Status List */}
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-base font-bold text-slate-900">Registered Complaint History</h2>
-            <p className="text-xs text-slate-500">Track resolution progress, field technician logs, and SLA deadlines</p>
+            <h2 className="text-base font-bold text-slate-900">My Complaint Status</h2>
+            <p className="text-xs text-slate-500">Current status of your registered complaints</p>
           </div>
           <div className="text-xs font-mono text-slate-500">
-            {customerTickets.length} Complaints Logged
+            {customerTickets.length} {customerTickets.length === 1 ? 'Complaint' : 'Complaints'}
           </div>
         </div>
 
         {customerTickets.length === 0 ? (
           <div className="py-12 text-center text-slate-500 text-xs">
-            No complaints registered for this account. Your internet service is operating nominally.
+            No complaints registered for this account.
           </div>
         ) : (
           <div className="space-y-4">
@@ -358,27 +358,21 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
                       {ticket.ticketNumber}
                     </span>
                     <span aria-hidden="true" className="text-slate-300">·</span>
-                    <span className="font-medium text-slate-700">{ticket.category.replace('_', ' ')}</span>
+                    <span className="font-medium text-slate-700">{ticket.category.replace(/_/g, ' ')}</span>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 text-slate-500">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>
-                        Target SLA: {ticket.priority === 'P1_CRITICAL' ? '8 Hours' : ticket.priority === 'P2_MAJOR' ? '24 Hours' : '48 Hours'}
-                      </span>
-                    </div>
-
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-500">Status:</span>
                     <span
-                      className={`font-semibold ${
+                      className={`px-2.5 py-0.5 rounded-full font-bold ${
                         ticket.status === 'RESOLVED' || ticket.status === 'CLOSED'
-                          ? 'text-emerald-700'
+                          ? 'bg-emerald-100 text-emerald-800'
                           : ticket.status === 'ESCALATED_PTA'
-                          ? 'text-rose-700'
-                          : 'text-amber-700'
+                          ? 'bg-rose-100 text-rose-800'
+                          : 'bg-amber-100 text-amber-800'
                       }`}
                     >
-                      {ticket.status.replace('_', ' ')}
+                      {ticket.status.replace(/_/g, ' ')}
                     </span>
                   </div>
                 </div>
@@ -388,51 +382,24 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
                 </div>
                 <p className="text-slate-600">{ticket.description}</p>
 
-                {/* Acknowledgment Status */}
+                {/* Complaint Status Summary */}
                 {ticket.acknowledgedAt ? (
                   <div className="flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 px-2.5 py-1.5 rounded border border-emerald-200">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>
-                      Complaint Acknowledged (ACK) by Citrus NOC · {new Date(ticket.acknowledgedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+                    <span>Complaint Acknowledged — Resolution in Progress</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 text-xs text-amber-800 bg-amber-50 px-2.5 py-1.5 rounded border border-amber-200">
                     <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                    <span>Awaiting initial NOC Acknowledgment (ACK) & Field Team Dispatch</span>
+                    <span>Pending Acknowledgment</span>
                   </div>
                 )}
 
-                {/* Live Online Update from NOC */}
+                {/* Status Note from Support if posted */}
                 {ticket.latestOnlineUpdate && (
                   <div className="p-3 bg-amber-50 border border-amber-300 rounded-lg text-xs space-y-1">
-                    <div className="flex items-center justify-between text-amber-950 font-bold">
-                      <span className="flex items-center gap-1.5">
-                        <Radio className="w-3.5 h-3.5 text-amber-600" />
-                        <span>Live Online Update from Citrus NOC Operations</span>
-                      </span>
-                      {ticket.latestOnlineUpdateAt && (
-                        <span className="font-mono text-[11px] text-amber-800">
-                          {new Date(ticket.latestOnlineUpdateAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      )}
-                    </div>
+                    <div className="text-amber-950 font-bold">Status Update:</div>
                     <p className="text-slate-900 font-medium">"{ticket.latestOnlineUpdate}"</p>
-                  </div>
-                )}
-
-                {/* Technical / Lineman status note */}
-                {ticket.assignedTechnician && (
-                  <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-between text-slate-600">
-                    <div>
-                      <span className="font-medium text-slate-900">Assigned Lineman: </span>
-                      {ticket.assignedTechnician}
-                    </div>
-                    {ticket.opticalPowerRx && (
-                      <div className="font-mono text-slate-700">
-                        Rx Power: {ticket.opticalPowerRx}
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -441,15 +408,15 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
                   <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <div className="font-bold text-emerald-950">
-                        Technical Resolution Complete!
+                        Complaint Resolved
                       </div>
                       <p className="text-emerald-800 text-[11px] mt-0.5">
-                        Please confirm your service is working and submit mandatory PTA closure feedback.
+                        Please confirm your service is working to close this complaint.
                       </p>
                     </div>
                     <button
                       onClick={() => setFeedbackTicket(ticket)}
-                      className="px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-md whitespace-nowrap shadow-xs"
+                      className="px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-md whitespace-nowrap shadow-xs cursor-pointer"
                     >
                       Verify & Rate Service
                     </button>
@@ -458,23 +425,12 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
 
                 {ticket.feedbackRating !== undefined && (
                   <div className="text-[11px] text-slate-500 flex items-center gap-2">
-                    <span className="font-medium text-slate-700">Customer Verified Rating:</span>
+                    <span className="font-medium text-slate-700">Your Rating:</span>
                     <span className="font-mono font-bold text-amber-600">
                       {'★'.repeat(ticket.feedbackRating)}{'☆'.repeat(5 - ticket.feedbackRating)} ({ticket.feedbackRating}/5)
                     </span>
-                    <span aria-hidden="true">·</span>
-                    <span className="italic">"{ticket.feedbackComments}"</span>
                   </div>
                 )}
-
-                <div className="flex justify-end pt-1">
-                  <button
-                    onClick={() => onSelectTicket(ticket)}
-                    className="text-xs text-emerald-700 hover:text-emerald-800 font-medium"
-                  >
-                    View Complete Audit Trail & Timeline &rarr;
-                  </button>
-                </div>
               </div>
             ))}
           </div>

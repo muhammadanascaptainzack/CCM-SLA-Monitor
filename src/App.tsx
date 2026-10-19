@@ -236,17 +236,22 @@ export default function App() {
 
   const handleGlobalTicketSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!modalCustomerId) return;
+    const targetCustomerId =
+      portalSession === 'customer' && activeCustomer ? activeCustomer.id : modalCustomerId;
+    if (!targetCustomerId) return;
     setIsSubmittingModalTicket(true);
     try {
       const created = await createComplaint({
-        customerId: modalCustomerId,
+        customerId: targetCustomerId,
         category: modalCategory,
         priority: modalPriority,
         subject: modalSubject,
         description: modalDescription,
       });
       setTickets((prev) => [created, ...prev]);
+      if (portalSession === 'customer' && customerFirebaseUid && activeCustomer) {
+        await saveCloudComplaint(customerFirebaseUid, created, activeCustomer.email).catch(() => {});
+      }
       setModalSuccessTicket(created.ticketNumber);
       setModalSubject('');
       setModalDescription('');
@@ -364,10 +369,10 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 flex flex-col text-slate-900">
       {/* Top Bar Contract Header */}
       <Header
-        currentTab={currentTab}
+        currentTab={portalSession === 'customer' ? 'customer' : currentTab}
         onSelectTab={(tab) => {
-          // Prevent customer from accessing staff tabs
-          if (portalSession === 'customer' && (tab === 'dashboard' || tab === 'admin' || tab === 'reports' || tab === 'server')) {
+          // Strictly lock customer to their own complaint status view only
+          if (portalSession === 'customer') {
             setCurrentTab('customer');
             return;
           }
@@ -379,6 +384,9 @@ export default function App() {
           setCurrentTab(tab);
         }}
         onOpenNewTicket={() => {
+          if (portalSession === 'customer' && activeCustomer) {
+            setModalCustomerId(activeCustomer.id);
+          }
           setShowGlobalNewTicketModal(true);
           setModalSuccessTicket(null);
         }}
@@ -399,8 +407,20 @@ export default function App() {
         {isLoading ? (
           <div className="py-24 text-center space-y-3">
             <div className="w-8 h-8 border-2 border-emerald-700 border-t-transparent rounded-full animate-spin mx-auto" />
-            <div className="text-sm font-medium text-slate-600">Connecting to Citrus Linux CMS Server (Port 4000/3000)...</div>
+            <div className="text-sm font-medium text-slate-600">Loading Citrus CMS Portal...</div>
           </div>
+        ) : portalSession === 'customer' ? (
+          /* Customer can ONLY see their own complaint status view — nothing else */
+          <CustomerPortalView
+            users={users}
+            tickets={mergedTickets}
+            currentCustomer={activeCustomer}
+            onSelectCustomer={setActiveCustomer}
+            onCreateCustomer={handleCreateCustomer}
+            onSubmitComplaint={handleCreateComplaint}
+            onSubmitFeedback={handleSubmitCustomerFeedback}
+            onSelectTicket={() => {}}
+          />
         ) : (
           <>
             {/* Admin Console View (Team Logins, Passwords, Ports) - STRICT ADMIN GUARD */}
@@ -521,38 +541,34 @@ export default function App() {
       <footer className="no-print bg-white border-t border-slate-200 mt-auto py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-slate-900">Citrus Pvt Ltd CMS</span>
+            <span className="font-extrabold text-slate-900">Citrus Pvt Ltd</span>
             <span aria-hidden="true">·</span>
-            <span>PTA District CVAS Compliance</span>
-            <span aria-hidden="true">·</span>
-            <span className="font-mono text-emerald-700 font-bold">Port 4000 & 3000 Active</span>
+            <span>Customer Support & Complaint Portal</span>
           </div>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setCurrentTab('admin')}
-              className="text-purple-700 font-bold hover:underline cursor-pointer"
-            >
-              Admin Console (Logins)
-            </button>
-            <button
-              onClick={() => setPortalSession('none')}
-              className="text-emerald-700 font-bold hover:underline cursor-pointer"
-            >
-              Dual Portal Sign-In
-            </button>
-            <button
-              onClick={() => setCurrentTab('reports')}
-              className="hover:text-slate-800 transition-colors cursor-pointer"
-            >
-              PTA Annexure-C Form
-            </button>
-            <button
-              onClick={() => setCurrentTab('server')}
-              className="hover:text-slate-800 transition-colors cursor-pointer"
-            >
-              Linux Service Setup
-            </button>
-          </div>
+          {portalSession !== 'customer' && (
+            <div className="flex items-center gap-4">
+              {activeStaff?.role === 'admin' && (
+                <button
+                  onClick={() => setCurrentTab('admin')}
+                  className="text-purple-700 font-bold hover:underline cursor-pointer"
+                >
+                  Admin Console (Logins)
+                </button>
+              )}
+              <button
+                onClick={() => setCurrentTab('reports')}
+                className="hover:text-slate-800 transition-colors cursor-pointer"
+              >
+                PTA Annexure-C Form
+              </button>
+              <button
+                onClick={() => setCurrentTab('server')}
+                className="hover:text-slate-800 transition-colors cursor-pointer"
+              >
+                Linux Service Setup
+              </button>
+            </div>
+          )}
         </div>
       </footer>
 
@@ -562,8 +578,8 @@ export default function App() {
           <div className="bg-white rounded-xl shadow-xl border border-slate-200 max-w-lg w-full p-5 space-y-4 text-xs animate-in fade-in duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Lodge PTA Regulatory Complaint</h3>
-                <p className="text-slate-500">Instant Unique Ticket Generation & SLA Tracking</p>
+                <h3 className="text-base font-bold text-slate-900">Lodge Complaint</h3>
+                <p className="text-slate-500">Submit a new service complaint</p>
               </div>
               <button
                 onClick={() => setShowGlobalNewTicketModal(false)}
@@ -582,37 +598,41 @@ export default function App() {
                   {modalSuccessTicket}
                 </div>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Assigned into NOC queue with statutory PTA resolution deadline.
+                  Your complaint has been logged and assigned for resolution.
                 </p>
                 <button
                   onClick={() => {
                     setShowGlobalNewTicketModal(false);
-                    setCurrentTab('tickets');
+                    if (portalSession !== 'customer') {
+                      setCurrentTab('tickets');
+                    }
                   }}
                   className="mt-2 px-4 py-1.5 text-xs font-semibold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-md cursor-pointer"
                 >
-                  View in Ticket Queue
+                  {portalSession === 'customer' ? 'Return to My Complaints' : 'View in Ticket Queue'}
                 </button>
               </div>
             ) : (
               <form onSubmit={handleGlobalTicketSubmit} className="space-y-3.5">
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1">
-                    Select Subscriber / Circuit ID *
-                  </label>
-                  <select
-                    value={modalCustomerId}
-                    onChange={(e) => setModalCustomerId(e.target.value)}
-                    required
-                    className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white text-slate-900 font-medium"
-                  >
-                    {customers.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} — {c.circuitId} ({c.district})
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {portalSession !== 'customer' && (
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">
+                      Select Subscriber / Circuit ID *
+                    </label>
+                    <select
+                      value={modalCustomerId}
+                      onChange={(e) => setModalCustomerId(e.target.value)}
+                      required
+                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white text-slate-900 font-medium"
+                    >
+                      {customers.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name} — {c.circuitId} ({c.district})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>

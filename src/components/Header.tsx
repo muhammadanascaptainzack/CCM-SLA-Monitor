@@ -57,45 +57,18 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </div>
             </button>
-
-            <div className="hidden lg:flex items-center gap-2 text-xs text-slate-500 pl-3 border-l border-slate-200">
-              <span className="font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                PTA CVAS Licensed
-              </span>
-              <span className="font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                Port 4000
-              </span>
-            </div>
           </div>
 
           {/* Zone 2: Navigation Links (Customer vs Staff RBAC) */}
           <nav className="hidden md:flex items-center gap-1.5">
             {portalMode === 'customer' ? (
-              <>
-                <button
-                  onClick={() => onSelectTab('customer')}
-                  className={`px-3.5 py-2 text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer rounded-xl ${
-                    currentTab === 'customer'
-                      ? 'bg-emerald-100 text-emerald-950 shadow-xs border border-emerald-300'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                  }`}
-                >
-                  <UserCheck className="w-4 h-4 text-emerald-600" />
-                  <span>My Complaints & Live Updates</span>
-                </button>
-
-                <button
-                  onClick={() => onSelectTab('tickets')}
-                  className={`px-3.5 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer rounded-xl ${
-                    currentTab === 'tickets'
-                      ? 'bg-emerald-100 text-emerald-950 shadow-xs border border-emerald-300'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                  }`}
-                >
-                  <Ticket className="w-4 h-4 text-emerald-600" />
-                  <span>Network Status</span>
-                </button>
-              </>
+              <button
+                onClick={() => onSelectTab('customer')}
+                className="px-3.5 py-2 text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer rounded-xl bg-emerald-100 text-emerald-950 shadow-xs border border-emerald-300"
+              >
+                <UserCheck className="w-4 h-4 text-emerald-600" />
+                <span>My Complaint Status</span>
+              </button>
             ) : (
               <>
                 <button
@@ -223,20 +196,12 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Mobile secondary navigation */}
         <div className="md:hidden flex items-center gap-1.5 overflow-x-auto py-2.5 border-t border-slate-100 text-xs">
           {portalMode === 'customer' ? (
-            <>
-              <button
-                onClick={() => onSelectTab('customer')}
-                className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'customer' ? 'bg-emerald-600 text-white' : 'text-slate-600 bg-slate-100'}`}
-              >
-                My Complaints
-              </button>
-              <button
-                onClick={() => onSelectTab('tickets')}
-                className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'tickets' ? 'bg-emerald-600 text-white' : 'text-slate-600 bg-slate-100'}`}
-              >
-                Network Status
-              </button>
-            </>
+            <button
+              onClick={() => onSelectTab('customer')}
+              className="px-3 py-1.5 rounded-xl whitespace-nowrap font-bold bg-emerald-600 text-white"
+            >
+              My Complaint Status
+            </button>
           ) : (
             <>
               <button

@@ -855,10 +855,6 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   <span className="text-2xl font-black tracking-tight text-slate-950">
                     Citrus Pvt Ltd
                   </span>
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                    <ShieldCheck className="w-3 h-3" />
-                    PTA CVAS Licensed
-                  </span>
                 </div>
                 <p className="text-xs text-slate-500 font-medium">
                   High-Speed Optical Fiber Internet & Telecom Data Services
@@ -1065,13 +1061,15 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             )}
 
             {trackedTicket && (
-              <div className="mt-6 p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+              <div className="mt-6 p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
                   <div>
                     <span className="font-mono font-black text-base text-slate-950">
                       {trackedTicket.ticketNumber}
                     </span>
-                    <span className="text-xs text-slate-500 ml-2">({trackedTicket.category})</span>
+                    <span className="text-xs text-slate-500 ml-2">
+                      ({trackedTicket.category.replace(/_/g, ' ')})
+                    </span>
                   </div>
                   <span
                     className={`px-2.5 py-1 rounded-full text-xs font-black ${
@@ -1082,74 +1080,22 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                         : 'bg-rose-100 text-rose-800'
                     }`}
                   >
-                    Status: {trackedTicket.status}
+                    Status: {trackedTicket.status.replace(/_/g, ' ')}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  <div>
-                    <span className="text-slate-500 block">District</span>
-                    <span className="font-bold text-slate-900">{trackedTicket.district}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Acknowledged (ACK)</span>
-                    <span
-                      className={`font-bold ${
-                        trackedTicket.acknowledgedAt ? 'text-emerald-700' : 'text-amber-700'
-                      }`}
-                    >
-                      {trackedTicket.acknowledgedAt
-                        ? `Yes (${trackedTicket.acknowledgedBy || 'NOC'})`
-                        : 'Pending NOC ACK'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Assigned Team</span>
-                    <span className="font-bold text-slate-900">
-                      {trackedTicket.assignedTechnician || 'NOC Dispatch Queue'}
-                    </span>
-                  </div>
+                <div className="text-xs text-slate-700">
+                  <span className="font-bold text-slate-900">{trackedTicket.subject}</span>
                 </div>
 
-                {(trackedTicket.latestOnlineUpdate ||
-                  (trackedTicket.timeline && trackedTicket.timeline.length > 0)) && (
-                  <div className="pt-2 border-t border-slate-200">
-                    <span className="text-xs font-bold text-slate-800 block mb-2">
-                      Latest Online Updates & NOC Remarks:
+                {trackedTicket.latestOnlineUpdate && (
+                  <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
+                    <span className="text-[11px] text-emerald-800 font-bold block mb-0.5">
+                      Status Update:
                     </span>
-                    {trackedTicket.latestOnlineUpdate && (
-                      <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs mb-2">
-                        <div className="flex items-center justify-between text-[11px] text-emerald-800 font-bold mb-0.5">
-                          <span>Live NOC Web Update</span>
-                          {trackedTicket.latestOnlineUpdateAt && (
-                            <span>
-                              {new Date(trackedTicket.latestOnlineUpdateAt).toLocaleTimeString()}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-emerald-950 font-medium">
-                          {trackedTicket.latestOnlineUpdate}
-                        </p>
-                      </div>
-                    )}
-                    <div className="space-y-1.5">
-                      {trackedTicket.timeline?.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="p-2.5 rounded-xl bg-white border border-slate-200 text-xs"
-                        >
-                          <div className="flex items-center justify-between text-[11px] text-slate-500 mb-0.5">
-                            <span className="font-bold text-slate-700">
-                              {item.action} — {item.performedBy} ({item.role})
-                            </span>
-                            <span>{new Date(item.timestamp).toLocaleTimeString()}</span>
-                          </div>
-                          {item.notes && (
-                            <p className="text-slate-800 font-medium">{item.notes}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                    <p className="text-emerald-950 font-medium">
+                      {trackedTicket.latestOnlineUpdate}
+                    </p>
                   </div>
                 )}
               </div>
