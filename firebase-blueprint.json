@@ -1,0 +1,301 @@
+{
+  "entities": {
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Trusted administrator marker document keyed by Firebase Auth UID.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the administrator",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Verified administrator email",
+          "minLength": 3,
+          "maxLength": 120
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when admin record was created"
+        }
+      },
+      "required": ["uid", "email", "createdAt"]
+    },
+    "CustomerProfile": {
+      "title": "CustomerProfile",
+      "description": "Private subscriber account linked to the customer's Gmail account.",
+      "type": "object",
+      "properties": {
+        "ownerUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the customer owner",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "customerId": {
+          "type": "string",
+          "description": "Internal subscriber ID",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Subscriber full name or business name",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Customer Gmail address",
+          "minLength": 5,
+          "maxLength": 120
+        },
+        "phone": {
+          "type": "string",
+          "description": "Subscriber mobile contact number",
+          "minLength": 5,
+          "maxLength": 30
+        },
+        "cnic": {
+          "type": "string",
+          "description": "Subscriber CNIC reference",
+          "minLength": 5,
+          "maxLength": 25
+        },
+        "district": {
+          "type": "string",
+          "description": "Licensed PTA district",
+          "enum": ["Faisalabad", "Lahore", "Multan", "Rawalpindi", "Islamabad"],
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "areaAddress": {
+          "type": "string",
+          "description": "Premises installation address",
+          "minLength": 2,
+          "maxLength": 250
+        },
+        "circuitId": {
+          "type": "string",
+          "description": "Assigned fiber circuit ID",
+          "minLength": 2,
+          "maxLength": 64
+        },
+        "bandwidthPlan": {
+          "type": "string",
+          "description": "Subscribed fiber bandwidth package",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "connectionType": {
+          "type": "string",
+          "description": "Physical fiber access type",
+          "enum": ["FTTH", "GPON", "Wireless P2P", "Copper DSL"],
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp"
+        }
+      },
+      "required": [
+        "ownerUid",
+        "customerId",
+        "name",
+        "email",
+        "phone",
+        "cnic",
+        "district",
+        "areaAddress",
+        "circuitId",
+        "bandwidthPlan",
+        "connectionType",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CloudComplaint": {
+      "title": "CloudComplaint",
+      "description": "Customer complaint record stored in Cloud Firestore for Gmail-authenticated complaint history.",
+      "type": "object",
+      "properties": {
+        "ownerUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the customer who lodged the complaint",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ticketId": {
+          "type": "string",
+          "description": "Ticket unique identifier",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ticketNumber": {
+          "type": "string",
+          "description": "Official PTA tracking reference number",
+          "minLength": 3,
+          "maxLength": 64
+        },
+        "customerId": {
+          "type": "string",
+          "description": "Internal subscriber ID",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Subscriber name",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "customerEmail": {
+          "type": "string",
+          "format": "email",
+          "description": "Subscriber Gmail address",
+          "minLength": 5,
+          "maxLength": 120
+        },
+        "customerPhone": {
+          "type": "string",
+          "description": "Subscriber phone number",
+          "minLength": 5,
+          "maxLength": 30
+        },
+        "circuitId": {
+          "type": "string",
+          "description": "Optical fiber circuit ID",
+          "minLength": 2,
+          "maxLength": 64
+        },
+        "district": {
+          "type": "string",
+          "description": "PTA telecom district",
+          "enum": ["Faisalabad", "Lahore", "Multan", "Rawalpindi", "Islamabad"],
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "category": {
+          "type": "string",
+          "description": "Fault category",
+          "enum": [
+            "OFC_CUT",
+            "SPEED_DEGRADATION",
+            "FREQUENT_DISCONNECT",
+            "DNS_ROUTING",
+            "CPE_ONT_FAULT",
+            "BILLING_PAYMENT",
+            "NEW_PROVISIONING"
+          ],
+          "minLength": 2,
+          "maxLength": 50
+        },
+        "priority": {
+          "type": "string",
+          "description": "SLA priority level",
+          "enum": ["P1_CRITICAL", "P2_MAJOR", "P3_STANDARD"],
+          "minLength": 2,
+          "maxLength": 30
+        },
+        "status": {
+          "type": "string",
+          "description": "Current complaint lifecycle status",
+          "enum": ["REGISTERED", "ASSIGNED", "IN_PROGRESS", "ESCALATED_PTA", "RESOLVED", "CLOSED"],
+          "minLength": 2,
+          "maxLength": 30
+        },
+        "subject": {
+          "type": "string",
+          "description": "Short fault summary",
+          "minLength": 3,
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed complaint description",
+          "minLength": 3,
+          "maxLength": 1500
+        },
+        "latestOnlineUpdate": {
+          "type": "string",
+          "description": "Latest NOC online status note",
+          "minLength": 0,
+          "maxLength": 500
+        },
+        "customerFeedbackComment": {
+          "type": "string",
+          "description": "Customer satisfaction feedback comment",
+          "minLength": 0,
+          "maxLength": 500
+        },
+        "customerRating": {
+          "type": "number",
+          "description": "Customer rating from 0 to 5"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when complaint was created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when complaint was last updated"
+        }
+      },
+      "required": [
+        "ownerUid",
+        "ticketId",
+        "ticketNumber",
+        "customerId",
+        "customerName",
+        "customerEmail",
+        "customerPhone",
+        "circuitId",
+        "district",
+        "category",
+        "priority",
+        "status",
+        "subject",
+        "description",
+        "latestOnlineUpdate",
+        "customerFeedbackComment",
+        "customerRating",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/admins/{adminUid}": {
+      "schema": "AdminRecord",
+      "description": "Admin role lookup collection keyed by Firebase Auth UID."
+    },
+    "/users/{userId}": {
+      "schema": "CustomerProfile",
+      "description": "Private customer subscriber profile keyed by the owner's Firebase Auth UID."
+    },
+    "/complaints/{complaintId}": {
+      "schema": "CloudComplaint",
+      "description": "Customer complaints stored in Cloud Firestore and isolated by ownerUid."
+    }
+  }
+}

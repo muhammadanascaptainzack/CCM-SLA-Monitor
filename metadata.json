@@ -1,0 +1,6 @@
+{
+  "name": "Citrus Pvt Ltd - PTA District CVAS Complaint CMS",
+  "description": "Customer complaint management server & NOC regulatory compliance portal for Citrus Pvt Ltd (PTA District CVAS Licensee).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
