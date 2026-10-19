@@ -143,10 +143,13 @@ sudo systemctl restart citrus-cms
 
 ## Firebase Cloud Sync & Authorized Domains
 
-Customer profiles (`customers/{uid}`) and complaint histories (`complaints/{complaintId}`) are synced to **Google Cloud Firestore** using the configuration in `firebase-applet-config.json`.
+Customer profiles (`users/{uid}`) and complaint histories (`complaints/{complaintId}`) are synced to **Google Cloud Firestore** using the configuration in `firebase-applet-config.json`.
 
-If you host the application on your own custom domain (e.g., `cms.citrus.net.pk`) and want customers to use the **Google OAuth Popup** button:
-1. Open the [Firebase Console](https://console.firebase.google.com/) and select project `ai-studio-citruspvtltdptad-42dcabf4-9d96-45b2-8c3d-89bdf4fb9b38`.
-2. Navigate to **Authentication** → **Settings** → **Authorized domains**.
-3. Click **Add domain** and add your domain or server hostname.
-*(Note: Direct Gmail + Password customer registration and sign-in works on any IP address or domain without additional setup.)*
+To enable the **Google OAuth Popup** button on `http://117.134.204.102:4000/` and `http://172.16.150.40:4000/`:
+1. Open the direct Firebase Authentication Settings link for your project (`my-project-1484130495583`):
+   `https://console.firebase.google.com/project/my-project-1484130495583/authentication/settings`
+2. Click the **Authorized domains** tab and click **Add domain**.
+3. Add each IP address **without** `http://` and **without** `:4000/`:
+   - `117.134.204.102`
+   - `172.16.150.40`
+*(Note: Direct Gmail + Password customer registration and sign-in works immediately on any IP address or port without additional setup.)*

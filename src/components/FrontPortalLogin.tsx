@@ -188,6 +188,11 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
       setIsGoogleLoading(false);
       if (err?.code === 'auth/popup-closed-by-user') {
         setRegError('Google Sign-In popup was closed before completion.');
+      } else if (err?.code === 'auth/unauthorized-domain') {
+        const host = typeof window !== 'undefined' ? window.location.hostname : 'this IP/domain';
+        setRegError(
+          `Host "${host}" must be added in Firebase Console → Authentication → Settings → Authorized domains (enter "${host}" without http:// or :4000). Meanwhile, you can sign in or register directly with your Gmail & password below.`
+        );
       } else {
         setRegError(
           'Could not complete Google popup sign-in in this browser window. You can also sign in or register directly with your Gmail below.'
