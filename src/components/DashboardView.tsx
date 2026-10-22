@@ -81,7 +81,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <span aria-hidden="true">·</span>
             <span>Telecom Consumers Protection Regulations 2009</span>
             <span aria-hidden="true">·</span>
-            <span>District Faisalabad CVAS</span>
+            <span>District Sargodha, Pakistan CVAS</span>
           </div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">
             NOC Customer Complaint Management & SLA Compliance Monitor
@@ -322,11 +322,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
             <div className="text-lg font-bold">License # CITRUS-2024</div>
             <p className="text-xs text-emerald-200/80 mt-1">
-              Citrus Pvt Ltd · District Faisalabad jurisdiction. Complaint register maintained in accordance with PTA Telecom Act 1996 & TCPR 2009.
+              Citrus Pvt Ltd · District Sargodha, Pakistan jurisdiction. Complaint register maintained in accordance with PTA Telecom Act 1996 & TCPR 2009.
             </p>
             <div className="mt-4 pt-4 border-t border-emerald-800/60 flex items-center justify-between text-xs">
-              <span className="text-emerald-300">Zonal Office:</span>
-              <span className="font-medium text-white">PTA Lahore Complex</span>
+              <span className="text-emerald-300">24/7 NOC Helpline:</span>
+              <span className="font-mono font-bold text-amber-300">03390480022</span>
             </div>
           </div>
         </div>

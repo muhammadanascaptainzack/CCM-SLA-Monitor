@@ -13,14 +13,14 @@ const DB_FILE = path.resolve(DATA_DIR, 'complaints-db.json');
 
 const INITIAL_CONFIG: PTALicenseeConfig = {
   licenseeName: 'Citrus Pvt Ltd',
-  licenseNumber: 'CVAS-DATA/DIST-FSD/CITRUS-2024',
+  licenseNumber: 'CVAS-DATA/DIST-SGD/CITRUS-2024',
   licenseType: 'District CVAS (Class Value Added Services - Data & Internet)',
-  registeredDistrict: 'Faisalabad',
-  regionalPtaOffice: 'PTA Zonal Office, 2nd Floor, Telecom Complex, Lahore',
+  registeredDistrict: 'Sargodha',
+  regionalPtaOffice: 'PTA Zonal Office, Sargodha / Lahore Region',
   complianceOfficerName: 'Engr. Tariq Mehmood',
-  complianceOfficerEmail: 'compliance@citrus.net.pk',
-  complianceOfficerPhone: '+92-41-8719200',
-  emergencyNocHelpline: '041-111-248-787',
+  complianceOfficerEmail: 'support.citrus@gmail.com',
+  complianceOfficerPhone: '03390480022',
+  emergencyNocHelpline: '03390480022',
 };
 
 const INITIAL_USERS: User[] = [
@@ -28,11 +28,11 @@ const INITIAL_USERS: User[] = [
     id: 'usr-admin',
     name: 'Administrator (Citrus Operations Head)',
     email: 'admin@citrus.net.pk',
-    phone: '0300-1122334',
-    cnic: '33100-1122334-0',
+    phone: '03390480022',
+    cnic: '38403-1122334-0',
     role: 'admin',
     password: 'admin123',
-    district: 'Faisalabad',
+    district: 'Sargodha',
     status: 'active',
     createdAt: '2026-01-01T00:00:00.000Z'
   },
@@ -41,12 +41,12 @@ const INITIAL_USERS: User[] = [
     name: 'Muhammad Usman Khan',
     email: 'usman.khan@gmail.com',
     phone: '0300-8654321',
-    cnic: '33100-2451893-7',
+    cnic: '38403-2451893-7',
     role: 'customer',
     password: 'pass123',
-    circuitId: 'PK-FSD-0194',
-    district: 'Faisalabad',
-    areaAddress: 'House 42, Street 3, Madina Town, Faisalabad',
+    circuitId: 'PK-SGD-0194',
+    district: 'Sargodha',
+    areaAddress: 'House 42, Block C, Satellite Town, Sargodha',
     connectionType: 'FTTH',
     bandwidthPlan: '50 Mbps Fiber Unlimited',
     status: 'active',
@@ -54,15 +54,15 @@ const INITIAL_USERS: User[] = [
   },
   {
     id: 'usr-2',
-    name: 'Al-Madina Textile Mills Ltd (Commercial)',
-    email: 'it@almadinatex.com.pk',
+    name: 'Sargodha Citrus Processing & Exports Ltd',
+    email: 'it@sargodhacitrus.com.pk',
     phone: '0321-7891234',
-    cnic: '33102-9876543-1',
+    cnic: '38403-9876543-1',
     role: 'customer',
     password: 'pass123',
-    circuitId: 'PK-FSD-0820',
-    district: 'Faisalabad',
-    areaAddress: 'Mill Complex, Khurrianwala Industrial Estate, Faisalabad',
+    circuitId: 'PK-SGD-0820',
+    district: 'Sargodha',
+    areaAddress: 'University Road Commercial Hub, Sargodha',
     connectionType: 'FTTH',
     bandwidthPlan: '100 Mbps Dedicated CIR Leased Line',
     status: 'active',
@@ -73,12 +73,12 @@ const INITIAL_USERS: User[] = [
     name: 'Farhan Ali Bhatti',
     email: 'farhan.bhatti@gmail.com',
     phone: '0333-6549870',
-    cnic: '33104-5612348-9',
+    cnic: '38403-5612348-9',
     role: 'customer',
     password: 'pass123',
-    circuitId: 'PK-FSD-1045',
-    district: 'Faisalabad',
-    areaAddress: 'Plot 18, Block B, Peoples Colony No. 1, Faisalabad',
+    circuitId: 'PK-SGD-1045',
+    district: 'Sargodha',
+    areaAddress: 'Plot 18, Street 4, Model Town, Sargodha',
     connectionType: 'FTTH',
     bandwidthPlan: '30 Mbps Fiber Plus',
     status: 'active',
@@ -88,11 +88,11 @@ const INITIAL_USERS: User[] = [
     id: 'usr-4',
     name: 'Hafiz Bilal Ahmed (NOC Supervisor)',
     email: 'noc.bilal@citrus.net.pk',
-    phone: '0345-9876540',
-    cnic: '33100-4321987-5',
+    phone: '03390480022',
+    cnic: '38403-4321987-5',
     role: 'support_agent',
     password: 'noc123',
-    district: 'Faisalabad',
+    district: 'Sargodha',
     status: 'active',
     createdAt: '2026-01-01T08:00:00.000Z'
   },
@@ -101,22 +101,22 @@ const INITIAL_USERS: User[] = [
     name: 'Kamran Haider (Lineman / Splicer)',
     email: 'field.kamran@citrus.net.pk',
     phone: '0301-4455667',
-    cnic: '33101-7788990-3',
+    cnic: '38403-7788990-3',
     role: 'technician',
     password: 'field123',
-    district: 'Faisalabad',
+    district: 'Sargodha',
     status: 'active',
     createdAt: '2026-02-15T08:00:00.000Z'
   },
   {
     id: 'usr-6',
     name: 'Engr. Tariq Mehmood',
-    email: 'compliance@citrus.net.pk',
-    phone: '0300-8719200',
-    cnic: '33100-1122334-5',
+    email: 'support.citrus@gmail.com',
+    phone: '03390480022',
+    cnic: '38403-1122334-5',
     role: 'compliance_officer',
     password: 'pta123',
-    district: 'Faisalabad',
+    district: 'Sargodha',
     status: 'active',
     createdAt: '2026-01-01T08:00:00.000Z'
   }
@@ -131,7 +131,7 @@ const INITIAL_TICKETS: ComplaintTicket[] = [
     customerPhone: '0321-7891234',
     customerCnic: '33102-9876543-1',
     circuitId: 'PK-FSD-0820',
-    district: 'Faisalabad',
+    district: 'Sargodha',
     tehsilArea: 'Khurrianwala Industrial Area',
     connectionType: 'FTTH',
     bandwidthPlan: '100 Mbps Dedicated CIR Leased Line',
@@ -186,7 +186,7 @@ const INITIAL_TICKETS: ComplaintTicket[] = [
     customerPhone: '0300-8654321',
     customerCnic: '33100-2451893-7',
     circuitId: 'PK-FSD-0194',
-    district: 'Faisalabad',
+    district: 'Sargodha',
     tehsilArea: 'Madina Town',
     connectionType: 'FTTH',
     bandwidthPlan: '50 Mbps Fiber Unlimited',
@@ -237,7 +237,7 @@ const INITIAL_TICKETS: ComplaintTicket[] = [
     customerPhone: '0333-6549870',
     customerCnic: '33104-5612348-9',
     circuitId: 'PK-FSD-1045',
-    district: 'Faisalabad',
+    district: 'Sargodha',
     tehsilArea: 'Peoples Colony No. 1',
     connectionType: 'FTTH',
     bandwidthPlan: '30 Mbps Fiber Plus',
@@ -295,7 +295,7 @@ const INITIAL_TICKETS: ComplaintTicket[] = [
     customerPhone: '0300-8654321',
     customerCnic: '33100-2451893-7',
     circuitId: 'PK-FSD-0194',
-    district: 'Faisalabad',
+    district: 'Sargodha',
     tehsilArea: 'Madina Town',
     connectionType: 'FTTH',
     bandwidthPlan: '50 Mbps Fiber Unlimited',
@@ -343,7 +343,7 @@ const INITIAL_TICKETS: ComplaintTicket[] = [
     customerPhone: '0333-6549870',
     customerCnic: '33104-5612348-9',
     circuitId: 'PK-FSD-1045',
-    district: 'Faisalabad',
+    district: 'Sargodha',
     tehsilArea: 'Peoples Colony No. 1',
     connectionType: 'FTTH',
     bandwidthPlan: '30 Mbps Fiber Plus',
@@ -394,7 +394,7 @@ const INITIAL_TICKETS: ComplaintTicket[] = [
     customerPhone: '0321-7891234',
     customerCnic: '33102-9876543-1',
     circuitId: 'PK-FSD-0820',
-    district: 'Faisalabad',
+    district: 'Sargodha',
     tehsilArea: 'Khurrianwala Industrial Area',
     connectionType: 'FTTH',
     bandwidthPlan: '100 Mbps Dedicated CIR Leased Line',
@@ -463,6 +463,35 @@ class StorageManager {
         const parsed = JSON.parse(content);
         if (parsed.tickets && parsed.users && parsed.config) {
           let updated = false;
+          if (
+            parsed.config.registeredDistrict !== 'Sargodha' ||
+            parsed.config.emergencyNocHelpline !== '03390480022' ||
+            parsed.config.complianceOfficerEmail === 'compliance@citrus.net.pk'
+          ) {
+            parsed.config.registeredDistrict = 'Sargodha';
+            parsed.config.licenseNumber = 'CVAS-DATA/DIST-SGD/CITRUS-2024';
+            parsed.config.emergencyNocHelpline = '03390480022';
+            parsed.config.complianceOfficerPhone = '03390480022';
+            parsed.config.complianceOfficerEmail = 'support.citrus@gmail.com';
+            updated = true;
+          }
+          for (const u of parsed.users) {
+            if (u.email === 'compliance@citrus.net.pk') {
+              u.email = 'support.citrus@gmail.com';
+              u.phone = '03390480022';
+              updated = true;
+            }
+            if (u.district !== 'Sargodha') {
+              u.district = 'Sargodha';
+              updated = true;
+            }
+          }
+          for (const t of parsed.tickets) {
+            if (t.district !== 'Sargodha') {
+              t.district = 'Sargodha';
+              updated = true;
+            }
+          }
           for (const defaultUser of INITIAL_USERS) {
             const existing = parsed.users.find(
               (u: User) => u.id === defaultUser.id || u.email.toLowerCase() === defaultUser.email.toLowerCase()

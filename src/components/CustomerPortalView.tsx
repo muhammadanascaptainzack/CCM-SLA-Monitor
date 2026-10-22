@@ -112,19 +112,30 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Subscriber Account Banner */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white border border-emerald-500/30 rounded-3xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-            <span className="font-semibold text-emerald-800">PRIVATE GMAIL SUBSCRIBER PORTAL</span>
-            <span aria-hidden="true">·</span>
-            <span>Cloud Complaint History Synced</span>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-300 mb-1.5">
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black uppercase text-[10px]">
+              District Sargodha, Pakistan Only
+            </span>
+            <span className="font-bold text-emerald-200">PRIVATE GMAIL SUBSCRIBER PORTAL</span>
           </div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            My Complaint History & Live SLA Tracker
+          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+            My Complaint Status
           </h1>
-          <p className="text-sm text-slate-600 mt-0.5">
-            Lodge fiber service complaints and track NOC resolution progress privately linked to your Gmail account.
+          <p className="text-xs sm:text-sm text-emerald-100/90 mt-1">
+            Lodge fiber service complaints and check your personal complaint status privately linked to your Gmail account.
           </p>
+          <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-amber-300 font-mono font-bold">
+            <a href="tel:03390480022" className="hover:underline flex items-center gap-1">
+              <Phone className="w-3.5 h-3.5 text-amber-400" />
+              <span>24/7 NOC Helpline: 03390480022</span>
+            </a>
+            <span>·</span>
+            <a href="mailto:support.citrus@gmail.com" className="hover:underline text-emerald-300">
+              support.citrus@gmail.com
+            </a>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -133,7 +144,7 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
               setShowNewComplaintForm(true);
               setTicketSuccessNumber(null);
             }}
-            className="px-4 py-2.5 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap cursor-pointer"
+            className="px-5 py-3 text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 rounded-2xl transition-all flex items-center gap-2 shadow-lg whitespace-nowrap cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Lodge New Complaint</span>
@@ -142,7 +153,7 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
       </div>
 
       {/* Strictly Private Customer Profile Card (No Switcher) */}
-      <div className="bg-slate-900 text-white rounded-xl p-5 shadow-xs">
+      <div className="bg-slate-900 text-white rounded-2xl p-5 shadow-md border border-slate-800">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
           <div>
             <div className="text-xs text-slate-400">Authenticated Gmail Subscriber Account</div>
@@ -177,9 +188,9 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
               </span>
             </div>
             <div>
-              <span className="text-slate-400 block">District & Tehsil</span>
-              <span className="text-slate-200">
-                {activeCustomer.district} · {activeCustomer.areaAddress}
+              <span className="text-slate-400 block">Licensed Coverage</span>
+              <span className="text-amber-300 font-semibold">
+                District Sargodha, Pakistan · {activeCustomer.areaAddress || 'Sargodha'}
               </span>
             </div>
             <div>

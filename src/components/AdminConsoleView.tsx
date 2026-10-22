@@ -61,15 +61,15 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
   const [formPhone, setFormPhone] = useState('0300-');
-  const [formCnic, setFormCnic] = useState('33100-');
+  const [formCnic, setFormCnic] = useState('38403-');
   const [formRole, setFormRole] = useState<UserRole>('support_agent');
   const [formPassword, setFormPassword] = useState('citrus123');
-  const [formDistrict, setFormDistrict] = useState<DistrictName>('Faisalabad');
+  const [formDistrict, setFormDistrict] = useState<DistrictName>('Sargodha');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // License config form
-  const [helpline, setHelpline] = useState(config?.emergencyNocHelpline || '041-111-248-787');
-  const [licenseNumber, setLicenseNumber] = useState(config?.licenseNumber || 'CVAS-DATA/DIST-FSD/CITRUS-2024');
+  const [helpline, setHelpline] = useState(config?.emergencyNocHelpline || '03390480022');
+  const [licenseNumber, setLicenseNumber] = useState(config?.licenseNumber || 'CVAS-DATA/DIST-SGD/CITRUS-2024');
   const [isSavingConfig, setIsSavingConfig] = useState(false);
   const [configSavedToast, setConfigSavedToast] = useState(false);
 
@@ -97,10 +97,10 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
     setFormName('');
     setFormEmail('');
     setFormPhone('0300-');
-    setFormCnic('33100-');
+    setFormCnic('38403-');
     setFormRole('support_agent');
     setFormPassword('citrus123');
-    setFormDistrict('Faisalabad');
+    setFormDistrict('Sargodha');
     setShowAddModal(true);
   };
 
@@ -289,7 +289,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
           <div className="bg-purple-950/60 backdrop-blur-sm p-4 rounded-2xl border border-purple-700/50">
             <div className="text-xs font-bold text-purple-300">Registered Subscribers</div>
             <div className="text-2xl font-black text-white mt-1 font-mono">{customerCount}</div>
-            <div className="text-[11px] text-purple-300">District Faisalabad</div>
+            <div className="text-[11px] text-purple-300">District Sargodha, Pakistan</div>
           </div>
 
           <div className="bg-purple-950/60 backdrop-blur-sm p-4 rounded-2xl border border-purple-700/50">
@@ -748,10 +748,7 @@ WantedBy=multi-user.target`}
                     onChange={(e) => setFormDistrict(e.target.value as DistrictName)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:outline-none focus:bg-white focus:ring-1 focus:ring-purple-600"
                   >
-                    <option value="Faisalabad">District Faisalabad</option>
-                    <option value="Rawalpindi">District Rawalpindi</option>
-                    <option value="Lahore">District Lahore</option>
-                    <option value="Multan">District Multan</option>
+                    <option value="Sargodha">District Sargodha, Pakistan Only</option>
                   </select>
                 </div>
               </div>

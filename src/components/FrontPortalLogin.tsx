@@ -19,6 +19,19 @@ import {
   LogIn,
   PlusCircle,
   CloudCheck,
+  PhoneCall,
+  MapPin,
+  Wifi,
+  Copy,
+  Check,
+  Sparkles,
+  Activity,
+  Clock,
+  ChevronDown,
+  ChevronUp,
+  HelpCircle,
+  Globe,
+  Router,
 } from 'lucide-react';
 import {
   User as UserType,
@@ -50,6 +63,139 @@ interface FrontPortalLoginProps {
   }) => Promise<ComplaintTicket>;
 }
 
+interface SargodhaZone {
+  id: string;
+  name: string;
+  blocks: string;
+  oltNode: string;
+  status: 'Active GPON Fiber' | 'High-Speed FTTH';
+  opticalSignal: string;
+  pingMs: string;
+  color: string;
+  badgeBg: string;
+}
+
+const SARGODHA_ZONES: SargodhaZone[] = [
+  {
+    id: 'satellite-town',
+    name: 'Satellite Town (Blocks A, B, C, D & X, Y, Z)',
+    blocks: 'Main Commercial Market, Block A–Z Residential Sectors',
+    oltNode: 'SGD-OLT-01 (Huawei MA5800 X7)',
+    status: 'Active GPON Fiber',
+    opticalSignal: '-18.4 dBm (Optimal)',
+    pingMs: '4 ms',
+    color: 'from-emerald-500 to-teal-600',
+    badgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+  },
+  {
+    id: 'university-road',
+    name: 'University Road & UOS Campus Corridor',
+    blocks: 'University of Sargodha, Khayaban-e-Sadiq, New Satellite Town',
+    oltNode: 'SGD-OLT-02 (Core Ring North)',
+    status: 'High-Speed FTTH',
+    opticalSignal: '-19.1 dBm (Optimal)',
+    pingMs: '5 ms',
+    color: 'from-orange-500 to-amber-500',
+    badgeBg: 'bg-orange-100 text-orange-900 border-orange-300',
+  },
+  {
+    id: 'model-town',
+    name: 'Model Town, Civil Lines & Club Road',
+    blocks: 'Civil Lines, District Courts, Club Road, Officer Colony',
+    oltNode: 'SGD-OLT-03 (Metro Core)',
+    status: 'Active GPON Fiber',
+    opticalSignal: '-18.8 dBm (Optimal)',
+    pingMs: '4 ms',
+    color: 'from-sky-500 to-indigo-600',
+    badgeBg: 'bg-sky-100 text-sky-900 border-sky-300',
+  },
+  {
+    id: 'queens-cantt',
+    name: 'Queens Road, Cantt & PAF Road Commercial',
+    blocks: 'Cantt Plaza, Queens Road, Katchery Bazaar, Trust Plaza',
+    oltNode: 'SGD-OLT-04 (Enterprise CIR Node)',
+    status: 'High-Speed FTTH',
+    opticalSignal: '-17.9 dBm (Optimal)',
+    pingMs: '3 ms',
+    color: 'from-purple-600 to-fuchsia-600',
+    badgeBg: 'bg-purple-100 text-purple-900 border-purple-300',
+  },
+  {
+    id: 'faisalabad-lahore-rd',
+    name: 'Faisalabad Road, Lahore Road & Industrial Zone',
+    blocks: 'Chak 47 NB, Silanwali Road, Citrus Processing Zone, 49 Tail',
+    oltNode: 'SGD-OLT-05 (Industrial Feeder)',
+    status: 'Active GPON Fiber',
+    opticalSignal: '-19.6 dBm (Optimal)',
+    pingMs: '6 ms',
+    color: 'from-rose-500 to-orange-500',
+    badgeBg: 'bg-rose-100 text-rose-900 border-rose-300',
+  },
+  {
+    id: 'khushab-bhalwal',
+    name: 'Khushab Road, Bhalwal & Kot Momin Link',
+    blocks: 'Fatima Jinnah Road, Eidgah Road, Ispahani Town, Bhalwal Feeder',
+    oltNode: 'SGD-OLT-06 (District Ring West)',
+    status: 'High-Speed FTTH',
+    opticalSignal: '-19.3 dBm (Optimal)',
+    pingMs: '5 ms',
+    color: 'from-teal-500 to-cyan-600',
+    badgeBg: 'bg-teal-100 text-teal-900 border-teal-300',
+  },
+];
+
+const DIAGNOSTIC_PRESETS: {
+  category: ComplaintCategory;
+  priority: ComplaintPriority;
+  title: string;
+  subtitle: string;
+  slaHours: string;
+  tip: string;
+  gradient: string;
+  lightBg: string;
+}[] = [
+  {
+    category: 'OFC_CUT',
+    priority: 'P1_CRITICAL',
+    title: 'Red LOS Light Blinking',
+    subtitle: 'Optical Fiber Cut / Zero Signal',
+    slaHours: '8 Hours Mandatory SLA',
+    tip: 'Check if the yellow/white fiber patch cord behind your ONT router is unplugged or sharply bent. If intact, an outdoor fiber splice team is dispatched immediately.',
+    gradient: 'from-rose-500 to-red-600',
+    lightBg: 'bg-rose-50 border-rose-200 text-rose-950',
+  },
+  {
+    category: 'SPEED_DEGRADATION',
+    priority: 'P2_MAJOR',
+    title: 'Slow Speed / High Ping',
+    subtitle: 'Bandwidth Drop or Latency Spike',
+    slaHours: '24 Hours Mandatory SLA',
+    tip: 'Our NOC checks your optical Rx power (-15 to -24 dBm ideal) and resets your PPPoE bandwidth profile on the Sargodha Core BRAS.',
+    gradient: 'from-amber-500 to-orange-600',
+    lightBg: 'bg-amber-50 border-amber-200 text-amber-950',
+  },
+  {
+    category: 'FREQUENT_DISCONNECT',
+    priority: 'P2_MAJOR',
+    title: 'Frequent Disconnection',
+    subtitle: 'Link Drops Every Few Minutes',
+    slaHours: '24 Hours Mandatory SLA',
+    tip: 'Usually caused by high optical attenuation (> -27 dBm) or loose SC/APC connector. Our Sargodha lineman re-terminates the connector.',
+    gradient: 'from-purple-600 to-indigo-600',
+    lightBg: 'bg-purple-50 border-purple-200 text-purple-950',
+  },
+  {
+    category: 'CPE_ONT_FAULT',
+    priority: 'P2_MAJOR',
+    title: 'Router / ONT Hardware Fault',
+    subtitle: 'Power Adapter or Wi-Fi Issue',
+    slaHours: '24 Hours Mandatory SLA',
+    tip: 'If your router power LED is off or PON light fails to register, our field team tests the 12V power unit and optical transceiver.',
+    gradient: 'from-emerald-500 to-teal-600',
+    lightBg: 'bg-emerald-50 border-emerald-200 text-emerald-950',
+  },
+];
+
 export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   users,
   tickets,
@@ -67,7 +213,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   // Customer Auth Tab: 'google_signin' | 'register_gmail'
   const [customerAuthTab, setCustomerAuthTab] = useState<'google_signin' | 'register_gmail'>('google_signin');
 
-  // Google Popup onboarding state (when a new Google user signs in for the first time)
+  // Google Popup onboarding state
   const [pendingGoogleUser, setPendingGoogleUser] = useState<{
     uid: string;
     name: string;
@@ -75,18 +221,18 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   } | null>(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  // Direct Gmail Sign-In State (Private — user enters their own Gmail & password)
+  // Direct Gmail Sign-In State
   const [loginGmail, setLoginGmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [showCustPassword, setShowCustPassword] = useState(false);
 
-  // New Customer Register State
+  // New Customer Register State (District Sargodha only)
   const [regName, setRegName] = useState('');
   const [regGmail, setRegGmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regPhone, setRegPhone] = useState('0300-');
-  const [regCnic, setRegCnic] = useState('33100-');
-  const [regDistrict, setRegDistrict] = useState<DistrictName>('Faisalabad');
+  const [regCnic, setRegCnic] = useState('38403-');
+  const [regDistrict, setRegDistrict] = useState<DistrictName>('Sargodha');
   const [regAddress, setRegAddress] = useState('');
   const [regPlan, setRegPlan] = useState('50 Mbps Fiber Unlimited');
   const [isRegisteringCust, setIsRegisteringCust] = useState(false);
@@ -97,21 +243,40 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   const [trackedTicket, setTrackedTicket] = useState<ComplaintTicket | null>(null);
   const [trackError, setTrackError] = useState<string | null>(null);
 
-  // Staff & Admin Login State (Strictly Private — No exposed credentials)
+  // Staff & Admin Login State (Strictly Private)
   const [staffEmailInput, setStaffEmailInput] = useState('');
   const [staffPasswordInput, setStaffPasswordInput] = useState('');
   const [staffShowPassword, setStaffShowPassword] = useState(false);
   const [staffLoginError, setStaffLoginError] = useState<string | null>(null);
 
-  // Quick Lodge Form State on Intro page
+  // Quick Lodge Form State on Intro page (District Sargodha only)
   const [showQuickLodgeModal, setShowQuickLodgeModal] = useState(false);
   const [lodgeName, setLodgeName] = useState('');
   const [lodgePhone, setLodgePhone] = useState('0300-');
-  const [lodgeDistrict, setLodgeDistrict] = useState<DistrictName>('Faisalabad');
+  const [lodgeDistrict, setLodgeDistrict] = useState<DistrictName>('Sargodha');
   const [lodgeCategory, setLodgeCategory] = useState<ComplaintCategory>('OFC_CUT');
   const [lodgeDescription, setLodgeDescription] = useState('');
   const [isSubmittingQuickLodge, setIsSubmittingQuickLodge] = useState(false);
   const [quickLodgeSuccessTicket, setQuickLodgeSuccessTicket] = useState<ComplaintTicket | null>(null);
+
+  // Interactive UI States for Landing Page
+  const [selectedZone, setSelectedZone] = useState<SargodhaZone>(SARGODHA_ZONES[0]);
+  const [zoneSearch, setZoneSearch] = useState('');
+  const [activeDiagIndex, setActiveDiagIndex] = useState<number>(0);
+  const [copiedContact, setCopiedContact] = useState<'phone' | 'email' | null>(null);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  const handleCopyText = (text: string, type: 'phone' | 'email') => {
+    navigator.clipboard.writeText(text);
+    setCopiedContact(type);
+    setTimeout(() => setCopiedContact(null), 2200);
+  };
+
+  const filteredZones = SARGODHA_ZONES.filter(
+    (z) =>
+      z.name.toLowerCase().includes(zoneSearch.toLowerCase()) ||
+      z.blocks.toLowerCase().includes(zoneSearch.toLowerCase())
+  );
 
   // Handle Quick Track by Ticket Reference Number
   const handlePerformTrack = (e: React.FormEvent) => {
@@ -125,7 +290,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
     } else {
       setTrackedTicket(null);
       setTrackError(
-        `No complaint found with ticket reference: "${clean}". Please verify your ticket number (e.g., PTA-FSD-2026-0041).`
+        `No complaint found with ticket reference: "${clean}". Please verify your ticket number.`
       );
     }
   };
@@ -141,7 +306,6 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
       // 1. Check if profile already exists in Cloud Firestore
       const cloudProfile = await getCloudCustomerProfile(fbUser.uid);
       if (cloudProfile) {
-        // Ensure customer also exists in local backend for NOC assignment/tracking
         const existingLocal = users.find((u) => u.email.toLowerCase() === emailLower && u.role === 'customer');
         if (existingLocal) {
           setIsGoogleLoading(false);
@@ -153,7 +317,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             email: cloudProfile.email,
             phone: cloudProfile.phone,
             cnic: cloudProfile.cnic,
-            district: cloudProfile.district,
+            district: 'Sargodha',
             areaAddress: cloudProfile.areaAddress,
             bandwidthPlan: cloudProfile.bandwidthPlan,
             role: 'customer',
@@ -264,9 +428,9 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               email: emailClean,
               password: regPassword.trim() || undefined,
               phone: regPhone.trim(),
-              cnic: regCnic.trim() || '33100-0000000-0',
-              district: regDistrict,
-              areaAddress: regAddress.trim() || `${regDistrict} Fiber Sector`,
+              cnic: regCnic.trim() || '38403-0000000-0',
+              district: 'Sargodha',
+              areaAddress: regAddress.trim() || 'Satellite Town, Sargodha',
               bandwidthPlan: regPlan,
               role: 'customer',
               connectionType: 'FTTH',
@@ -286,7 +450,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
     }
   };
 
-  // Handle Staff & Admin Login (Strictly Private — No credentials exposed)
+  // Handle Staff & Admin Login (Strictly Private)
   const handleStaffLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setStaffLoginError(null);
@@ -301,17 +465,16 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
     let matchedUser = users.find((u) => u.email.toLowerCase() === emailClean);
 
-    // Built-in safeguard for System Administrator account in case DB was initialized before admin seed
     if (!matchedUser && emailClean === 'admin@citrus.net.pk' && pwdClean === 'admin123') {
       matchedUser = {
         id: 'usr-admin',
         name: 'Administrator (Citrus Operations Head)',
         email: 'admin@citrus.net.pk',
-        phone: '0300-1122334',
-        cnic: '33100-1122334-0',
+        phone: '03390480022',
+        cnic: '38403-1122334-0',
         role: 'admin',
         password: 'admin123',
-        district: 'Faisalabad',
+        district: 'Sargodha',
         status: 'active',
         createdAt: '2026-01-01T00:00:00.000Z',
       };
@@ -346,7 +509,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
       const tkt = await onLodgeQuickComplaint({
         customerName: lodgeName,
         phone: lodgePhone,
-        district: lodgeDistrict,
+        district: 'Sargodha',
         category: lodgeCategory,
         description: lodgeDescription,
         priority: lodgeCategory === 'OFC_CUT' ? 'P1_CRITICAL' : 'P2_MAJOR',
@@ -363,9 +526,9 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   // -------------------------------------------------------------
   if (pageView === 'customer_auth') {
     return (
-      <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col justify-between">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-slate-100 flex flex-col justify-between">
         {/* Top bar */}
-        <div className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md px-4 sm:px-8 py-4 flex items-center justify-between">
+        <div className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-4 sm:px-8 py-4 flex items-center justify-between">
           <button
             onClick={() => {
               setPendingGoogleUser(null);
@@ -374,45 +537,58 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             }}
             className="flex items-center gap-2 text-slate-300 hover:text-white text-xs font-bold transition-colors cursor-pointer"
           >
-            <ArrowLeft className="w-4 h-4 text-amber-500" />
-            <span>Back to Citrus Introduction Page</span>
+            <ArrowLeft className="w-4 h-4 text-amber-400" />
+            <span>Back to Citrus Sargodha Homepage</span>
           </button>
 
-          <div className="flex items-center gap-2">
-            <CloudCheck className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs font-extrabold text-emerald-400">
-              Private Gmail Cloud Complaint Portal
-            </span>
+          <div className="flex items-center gap-3">
+            <a
+              href="tel:03390480022"
+              className="hidden sm:flex items-center gap-1.5 text-xs font-mono font-bold text-amber-300 bg-amber-950/60 border border-amber-700/50 px-3 py-1 rounded-full"
+            >
+              <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
+              <span>24/7 Helpline: 03390480022</span>
+            </a>
+            <div className="flex items-center gap-2">
+              <CloudCheck className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-extrabold text-emerald-400">
+                Private Gmail Cloud Portal
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Content Box */}
         <div className="max-w-xl w-full mx-auto px-4 py-8">
-          <div className="bg-slate-950 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-            <div className="absolute -top-24 -right-24 w-60 h-60 bg-gradient-to-br from-amber-500/20 to-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="bg-slate-950/90 border-2 border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 flex items-center justify-center font-black text-2xl text-slate-950 shadow-lg">
+            <div className="flex items-center gap-3.5 mb-6">
+              <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 flex items-center justify-center font-black text-2xl text-slate-950 shadow-lg ring-2 ring-amber-400/50">
                 C
               </div>
               <div>
+                <div className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-amber-400 mb-0.5">
+                  <MapPin className="w-3 h-3" />
+                  <span>District Sargodha, Pakistan Only</span>
+                </div>
                 <h2 className="text-xl font-black text-white">Customer Gmail Sign-In & Registration</h2>
                 <p className="text-xs text-slate-400">
-                  Private account authentication — your complaint history is securely stored in Google Cloud
+                  Private account authentication — view only your own complaint status securely in the cloud
                 </p>
               </div>
             </div>
 
             {/* Auth Mode Tabs */}
-            <div className="grid grid-cols-2 p-1 bg-slate-900 rounded-xl mb-6 border border-slate-800">
+            <div className="grid grid-cols-2 p-1.5 bg-slate-900 rounded-2xl mb-6 border border-slate-800">
               <button
                 onClick={() => {
                   setRegError(null);
                   setCustomerAuthTab('google_signin');
                 }}
-                className={`py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                className={`py-2.5 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   customerAuthTab === 'google_signin'
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                    ? 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white shadow-lg'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -424,9 +600,9 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   setRegError(null);
                   setCustomerAuthTab('register_gmail');
                 }}
-                className={`py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                className={`py-2.5 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   customerAuthTab === 'register_gmail'
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                    ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 text-slate-950 shadow-lg'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -436,7 +612,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             </div>
 
             {regError && (
-              <div className="mb-5 p-3 rounded-xl bg-red-950/60 border border-red-800/80 text-red-200 text-xs flex items-center gap-2">
+              <div className="mb-5 p-3.5 rounded-2xl bg-red-950/70 border border-red-800 text-red-200 text-xs flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
                 <span>{regError}</span>
               </div>
@@ -445,7 +621,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             {customerAuthTab === 'google_signin' ? (
               <div className="space-y-5">
                 {/* Official Google OAuth Button */}
-                <div className="p-5 bg-slate-900/90 rounded-2xl border border-slate-800 text-center space-y-4">
+                <div className="p-5 bg-gradient-to-b from-slate-900 to-slate-900/70 rounded-2xl border border-slate-800 text-center space-y-4">
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto shadow-md">
                     <svg className="w-6 h-6" viewBox="0 0 24 24">
                       <path
@@ -469,7 +645,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   <div>
                     <h3 className="text-sm font-bold text-white">Continue with Google (Gmail)</h3>
                     <p className="text-xs text-slate-400 mt-1">
-                      Sign in securely with your personal Gmail account to access your private complaint history stored in the cloud.
+                      Sign in securely with your personal Gmail account to view your private complaint status in District Sargodha.
                     </p>
                   </div>
                   <button
@@ -510,7 +686,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   <div className="grow border-t border-slate-800"></div>
                 </div>
 
-                {/* Private Direct Gmail Sign-In Form (No other customer accounts displayed) */}
+                {/* Private Direct Gmail Sign-In Form */}
                 <form onSubmit={handleDirectGmailSignIn} className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">Your Registered Gmail Address</label>
@@ -560,9 +736,9 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                 <div className="pt-2">
                   <button
                     onClick={() => setCustomerAuthTab('register_gmail')}
-                    className="w-full py-3 rounded-xl border border-dashed border-slate-700 hover:border-emerald-500 text-xs font-bold text-slate-300 hover:text-white transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-3 rounded-xl border border-dashed border-slate-700 hover:border-amber-500 text-xs font-bold text-slate-300 hover:text-amber-300 transition-colors flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <UserPlus className="w-4 h-4 text-emerald-400" />
+                    <UserPlus className="w-4 h-4 text-amber-400" />
                     <span>First time here? Register Your Gmail Account</span>
                   </button>
                 </div>
@@ -573,7 +749,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-700/70 text-emerald-200 text-xs flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>
-                      Google Account Verified (<strong>{pendingGoogleUser.email}</strong>). Complete your subscriber details below to save your profile to Google Cloud.
+                      Google Account Verified (<strong>{pendingGoogleUser.email}</strong>). Complete your Sargodha subscriber details below.
                     </span>
                   </div>
                 )}
@@ -587,7 +763,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
                     placeholder="Enter your full name"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-emerald-500 text-white text-xs placeholder-slate-500 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs placeholder-slate-500 focus:outline-none"
                   />
                 </div>
 
@@ -603,7 +779,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                         value={regGmail}
                         onChange={(e) => setRegGmail(e.target.value)}
                         placeholder="yourname@gmail.com"
-                        className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-emerald-500 text-white text-xs placeholder-slate-500 focus:outline-none read-only:opacity-75"
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs placeholder-slate-500 focus:outline-none read-only:opacity-75"
                       />
                       <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                     </div>
@@ -620,7 +796,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                         value={regPassword}
                         onChange={(e) => setRegPassword(e.target.value)}
                         placeholder="Create a private password"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-emerald-500 text-white text-xs placeholder-slate-500 focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs placeholder-slate-500 focus:outline-none"
                       />
                     </div>
                   )}
@@ -636,7 +812,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                       value={regPhone}
                       onChange={(e) => setRegPhone(e.target.value)}
                       placeholder="0300-1234567"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-emerald-500 text-white text-xs placeholder-slate-500 focus:outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs placeholder-slate-500 focus:outline-none"
                     />
                   </div>
                   <div>
@@ -647,25 +823,21 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                       maxLength={25}
                       value={regCnic}
                       onChange={(e) => setRegCnic(e.target.value)}
-                      placeholder="33100-1234567-1"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-emerald-500 text-white text-xs placeholder-slate-500 focus:outline-none"
+                      placeholder="38403-1234567-1"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs placeholder-slate-500 focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">District / Region *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">Licensed District *</label>
                     <select
                       value={regDistrict}
                       onChange={(e) => setRegDistrict(e.target.value as DistrictName)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-emerald-500 text-white text-xs focus:outline-none"
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs focus:outline-none"
                     >
-                      <option value="Faisalabad">Faisalabad (Primary)</option>
-                      <option value="Lahore">Lahore</option>
-                      <option value="Multan">Multan</option>
-                      <option value="Rawalpindi">Rawalpindi</option>
-                      <option value="Islamabad">Islamabad</option>
+                      <option value="Sargodha">District Sargodha, Pakistan Only</option>
                     </select>
                   </div>
                   <div>
@@ -673,7 +845,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                     <select
                       value={regPlan}
                       onChange={(e) => setRegPlan(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-emerald-500 text-white text-xs focus:outline-none"
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs focus:outline-none"
                     >
                       <option value="30 Mbps Fiber Plus">30 Mbps Fiber Plus</option>
                       <option value="50 Mbps Fiber Unlimited">50 Mbps Fiber Unlimited</option>
@@ -683,22 +855,22 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Installation Address *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Installation Address in Sargodha *</label>
                   <input
                     type="text"
                     required
                     maxLength={250}
                     value={regAddress}
                     onChange={(e) => setRegAddress(e.target.value)}
-                    placeholder="House / Office Plaza, Street, Area"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-emerald-500 text-white text-xs placeholder-slate-500 focus:outline-none"
+                    placeholder="e.g. Block C, Satellite Town / University Road, Sargodha"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs placeholder-slate-500 focus:outline-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isRegisteringCust}
-                  className="w-full py-3 px-4 rounded-xl font-black text-xs text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full py-3 px-4 rounded-xl font-black text-xs text-slate-950 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-300 hover:to-orange-400 transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isRegisteringCust ? (
                     <span>Saving Account to Cloud...</span>
@@ -715,15 +887,15 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
         </div>
 
         {/* Footer info */}
-        <div className="text-center py-4 text-xs text-slate-500 border-t border-slate-800">
-          Citrus Pvt Ltd PTA CVAS Complaint Redressal Framework · End-to-End Subscriber Privacy Enabled
+        <div className="text-center py-4 text-xs text-slate-400 border-t border-slate-800/80">
+          Citrus Pvt Ltd · Licensed PTA CVAS District Sargodha, Pakistan · 24/7 Helpline: 03390480022 · support.citrus@gmail.com
         </div>
       </div>
     );
   }
 
   // -------------------------------------------------------------
-  // VIEW 2: DEDICATED STAFF & ADMIN LOGIN PAGE (Strict Privacy — No Credentials Shown)
+  // VIEW 2: DEDICATED STAFF & ADMIN LOGIN PAGE (Strict Privacy)
   // -------------------------------------------------------------
   if (pageView === 'staff_auth') {
     return (
@@ -738,7 +910,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             className="flex items-center gap-2 text-slate-300 hover:text-white text-xs font-bold transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 text-amber-500" />
-            <span>Back to Citrus Introduction Page</span>
+            <span>Back to Citrus Sargodha Homepage</span>
           </button>
 
           <div className="flex items-center gap-2 text-xs font-extrabold text-amber-400 bg-amber-950/60 px-3 py-1 rounded-full border border-amber-800/60">
@@ -756,7 +928,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               </div>
               <div>
                 <h2 className="text-xl font-black text-white">Staff & NOC Operations</h2>
-                <p className="text-xs text-slate-400">Authorized Citrus personnel & administrator login</p>
+                <p className="text-xs text-slate-400">Authorized Citrus Sargodha personnel & administrator login</p>
               </div>
             </div>
 
@@ -830,62 +1002,115 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
         {/* Footer */}
         <div className="text-center py-4 text-xs text-slate-500 border-t border-slate-800">
-          Citrus Pvt Ltd Network Operations Center (NOC) · Authorized Staff Access Only
+          Citrus Pvt Ltd Network Operations Center (NOC) · District Sargodha, Pakistan · Authorized Staff Access Only
         </div>
       </div>
     );
   }
 
   // -------------------------------------------------------------
-  // VIEW 3: MAIN INTRODUCTION PAGE (Citrus Pvt Ltd)
+  // VIEW 3: MAIN INTRODUCTION PAGE (Citrus Pvt Ltd — Vibrant & Interactive)
   // -------------------------------------------------------------
+  const currentDiag = DIAGNOSTIC_PRESETS[activeDiagIndex];
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-amber-200">
-      {/* 1. TOP HEADER & PROMINENT CUSTOMER ACTION */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-amber-300 selection:text-slate-950">
+      {/* 1. TOP COLORFUL ANNOUNCEMENT & HELPLINE BAR */}
+      <div className="bg-gradient-to-r from-slate-950 via-emerald-950 to-slate-950 text-white px-4 py-2 border-b border-emerald-500/30">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] uppercase tracking-wider">
+              <Radio className="w-3 h-3 text-slate-950 animate-pulse" />
+              District Sargodha, Pakistan Only
+            </span>
+            <span className="text-emerald-200 font-semibold hidden sm:inline">
+              Licensed PTA CVAS Optical Fiber Internet & Telecom Redressal Portal
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4 ml-auto">
+            <a
+              href="tel:03390480022"
+              className="flex items-center gap-1.5 font-mono font-extrabold text-amber-300 hover:text-amber-200 transition-colors"
+            >
+              <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
+              <span>24/7 NOC Helpline: 03390480022</span>
+            </a>
+            <span className="text-slate-600 hidden md:inline">|</span>
+            <a
+              href="mailto:support.citrus@gmail.com"
+              className="hidden md:flex items-center gap-1.5 font-mono text-emerald-300 hover:text-white transition-colors"
+            >
+              <Mail className="w-3.5 h-3.5 text-emerald-400" />
+              <span>support.citrus@gmail.com</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. STICKY MAIN HEADER */}
+      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 gap-4">
             {/* Logo & Company Identity */}
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg ring-2 ring-orange-400/40">
+            <div className="flex items-center gap-3.5 shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg ring-2 ring-orange-400/50">
                 C
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-black tracking-tight text-slate-950">
+                  <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-slate-950 via-slate-800 to-emerald-900 bg-clip-text text-transparent">
                     Citrus Pvt Ltd
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-medium">
-                  High-Speed Optical Fiber Internet & Telecom Data Services
+                <p className="text-xs text-slate-600 font-semibold">
+                  High-Speed FTTH Fiber Broadband · District Sargodha, Pakistan
                 </p>
               </div>
             </div>
 
-            {/* Top Right Action Zone: Highly Visible Register Complaint & Track buttons */}
+            {/* Top Right Action Zone */}
             <div className="flex items-center gap-3">
               <div className="hidden lg:flex flex-col text-right pr-3 border-r border-slate-200">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">24/7 NOC Helpline</span>
-                <span className="font-mono font-black text-xs text-slate-800">041-111-248-787</span>
+                <span className="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wider">
+                  24/7 NOC Helpline & Support
+                </span>
+                <a
+                  href="tel:03390480022"
+                  className="font-mono font-black text-sm text-slate-900 hover:text-orange-600 transition-colors"
+                >
+                  03390480022
+                </a>
               </div>
+
+              <button
+                onClick={() => {
+                  const el = document.getElementById('coverage-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="hidden md:flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-extrabold text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all cursor-pointer border border-amber-200"
+              >
+                <MapPin className="w-3.5 h-3.5 text-orange-600" />
+                <span>Sargodha Coverage</span>
+              </button>
 
               <button
                 onClick={() => {
                   const el = document.getElementById('track-section');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer border border-slate-200"
+                className="hidden sm:flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-extrabold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer border border-slate-200"
               >
-                <Search className="w-3.5 h-3.5 text-slate-500" />
-                <span>Track Complaint</span>
+                <Search className="w-3.5 h-3.5 text-slate-600" />
+                <span>Track Ticket</span>
               </button>
 
               {/* PRIMARY PROMINENT TOP BUTTON: Register Complaint Login (Gmail) */}
               <button
                 onClick={() => setPageView('customer_auth')}
-                className="px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm text-white bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 hover:from-emerald-500 hover:to-teal-600 active:scale-[0.98] transition-all shadow-lg hover:shadow-emerald-500/25 flex items-center gap-2 cursor-pointer ring-2 ring-emerald-400/40"
+                className="px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.98] transition-all shadow-lg hover:shadow-emerald-500/30 flex items-center gap-2 cursor-pointer ring-2 ring-emerald-400/50"
               >
-                <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0">
+                <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0 shadow-xs">
                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
                     <path
                       fill="#4285F4"
@@ -913,124 +1138,461 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
         </div>
       </header>
 
-      {/* 2. HERO INTRODUCTION SECTION */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-amber-500/10 via-orange-500/5 to-transparent pt-12 pb-16 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-950 border border-orange-300 text-xs font-black mb-4">
-              <Zap className="w-3.5 h-3.5 text-orange-600" />
-              <span>PTA CVAS Regulated Telecom Redressal System · Cloud Synced</span>
+      {/* 3. VIBRANT HERO SECTION WITH INTERACTIVE SUPPORT & DIAGNOSTIC CARDS */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 text-white py-14 sm:py-20 border-b border-emerald-800/40">
+        {/* Decorative Citrus & Emerald Glow Blobs */}
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 right-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 left-1/3 w-80 h-80 bg-amber-400/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            {/* Left Column: Hero Value Proposition */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/40 text-amber-300 text-xs font-black shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>Licensed PTA CVAS District Coverage · District Sargodha, Pakistan Only</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
+                Ultra-Fast Optical Fiber Internet in{' '}
+                <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-emerald-400 bg-clip-text text-transparent">
+                  District Sargodha
+                </span>
+              </h1>
+
+              <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
+                Welcome to <span className="font-extrabold text-white">Citrus Pvt Ltd</span>. Sign in with your personal{' '}
+                <span className="font-bold text-amber-300">Gmail account</span> to lodge fiber complaints and track your live resolution status with 100% private cloud protection.
+              </p>
+
+              {/* Hero CTA Buttons */}
+              <div className="flex flex-wrap items-center gap-4 pt-1">
+                <button
+                  onClick={() => setPageView('customer_auth')}
+                  className="px-6 py-4 rounded-2xl font-black text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 active:scale-[0.99] transition-all shadow-xl shadow-orange-500/20 flex items-center gap-2.5 cursor-pointer"
+                >
+                  <Headphones className="w-4 h-4 text-slate-950" />
+                  <span>Sign In / Register with Gmail</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                <button
+                  onClick={() => {
+                    setLodgeDistrict('Sargodha');
+                    setShowQuickLodgeModal(true);
+                  }}
+                  className="px-5 py-4 rounded-2xl font-black text-sm text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <PlusCircle className="w-4 h-4 text-amber-400" />
+                  <span>Express Quick Complaint</span>
+                </button>
+              </div>
+
+              {/* Interactive Direct Support Bar (Helpline 03390480022 & support.citrus@gmail.com) */}
+              <div className="pt-3 grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-2xl">
+                <div className="p-4 rounded-2xl bg-slate-900/80 border border-amber-500/30 hover:border-amber-400 transition-all flex items-center justify-between gap-3 group">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center font-black shrink-0 shadow-md">
+                      <PhoneCall className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
+                        24/7 NOC Helpline & Support
+                      </div>
+                      <a
+                        href="tel:03390480022"
+                        className="font-mono font-black text-base text-white hover:text-amber-300 transition-colors"
+                      >
+                        03390480022
+                      </a>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyText('03390480022', 'phone')}
+                    title="Copy Helpline Number"
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-bold text-slate-200 flex items-center gap-1 cursor-pointer border border-slate-700"
+                  >
+                    {copiedContact === 'phone' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-400">Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-900/80 border border-emerald-500/30 hover:border-emerald-400 transition-all flex items-center justify-between gap-3 group">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-slate-950 flex items-center justify-center font-black shrink-0 shadow-md">
+                      <Mail className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">
+                        Official Support Email
+                      </div>
+                      <a
+                        href="mailto:support.citrus@gmail.com"
+                        className="font-mono font-bold text-xs sm:text-sm text-white hover:text-emerald-300 truncate block transition-colors"
+                      >
+                        support.citrus@gmail.com
+                      </a>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyText('support.citrus@gmail.com', 'email')}
+                    title="Copy Support Email"
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-bold text-slate-200 flex items-center gap-1 cursor-pointer border border-slate-700 shrink-0"
+                  >
+                    {copiedContact === 'email' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-400">Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black text-slate-950 tracking-tight leading-tight mb-4">
-              Fast, Reliable Fiber Internet with Private Cloud Complaint Tracking
-            </h1>
+            {/* Right Column: Interactive Self-Diagnostic & Instant Fault Selector */}
+            <div className="lg:col-span-5">
+              <div className="bg-slate-900/90 backdrop-blur-xl border-2 border-amber-500/30 rounded-3xl p-6 shadow-2xl space-y-5">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-slate-950 flex items-center justify-center font-black">
+                      <Router className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 block">
+                        Interactive Fiber Assistant
+                      </span>
+                      <h3 className="text-sm font-black text-white">
+                        Select Your Router Symptom
+                      </h3>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black">
+                    Live SLA Calculator
+                  </span>
+                </div>
 
-            <p className="text-base sm:text-lg text-slate-700 leading-relaxed mb-8">
-              Welcome to <span className="font-bold text-slate-950">Citrus Pvt Ltd</span>. Register or sign in with your personal{' '}
-              <span className="font-bold text-emerald-800">Gmail account</span> so your subscriber data and complete complaint history are securely stored in the cloud with strict privacy.
-            </p>
+                {/* Symptom Selector Pills */}
+                <div className="grid grid-cols-2 gap-2.5">
+                  {DIAGNOSTIC_PRESETS.map((item, idx) => {
+                    const isSelected = activeDiagIndex === idx;
+                    return (
+                      <button
+                        key={item.category}
+                        type="button"
+                        onClick={() => setActiveDiagIndex(idx)}
+                        className={`p-3 rounded-2xl text-left transition-all cursor-pointer border ${
+                          isSelected
+                            ? `bg-gradient-to-r ${item.gradient} text-white border-transparent shadow-lg scale-[1.02]`
+                            : 'bg-slate-950/80 hover:bg-slate-800/80 text-slate-300 border-slate-800'
+                        }`}
+                      >
+                        <div className="text-xs font-black leading-snug">{item.title}</div>
+                        <div
+                          className={`text-[10px] mt-0.5 ${
+                            isSelected ? 'text-white/90 font-semibold' : 'text-slate-400'
+                          }`}
+                        >
+                          {item.subtitle}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
 
-            {/* Quick Hero Actions */}
-            <div className="flex flex-wrap items-center gap-4">
-              <button
-                onClick={() => setPageView('customer_auth')}
-                className="px-6 py-3.5 rounded-2xl font-black text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-xl hover:shadow-emerald-500/30 flex items-center gap-2 cursor-pointer"
-              >
-                <Headphones className="w-4 h-4" />
-                <span>Sign In / Register with Gmail</span>
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </button>
-
-              <button
-                onClick={() => setShowQuickLodgeModal(true)}
-                className="px-5 py-3.5 rounded-2xl font-black text-sm text-slate-800 bg-white hover:bg-slate-100 border border-slate-300 transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
-              >
-                <PlusCircle className="w-4 h-4 text-orange-600" />
-                <span>Express Quick Complaint</span>
-              </button>
+                {/* Dynamic Diagnostic Output Box */}
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-extrabold text-white flex items-center gap-1.5">
+                      <Activity className="w-4 h-4 text-amber-400" />
+                      <span>{currentDiag.title}</span>
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold">
+                      {currentDiag.slaHours}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {currentDiag.tip}
+                  </p>
+                  <div className="pt-1 flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLodgeCategory(currentDiag.category);
+                        setLodgeDistrict('Sargodha');
+                        setShowQuickLodgeModal(true);
+                      }}
+                      className="w-full py-2.5 px-4 rounded-xl font-black text-xs text-slate-950 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                    >
+                      <Zap className="w-3.5 h-3.5" />
+                      <span>Report "{currentDiag.title}" Now</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. THREE-STEP PROCESS */}
-      <section className="py-12 bg-white border-b border-slate-200">
+      {/* 4. COVERAGE NETWORK: LICENSED PTA CVAS DISTRICT COVERAGE — DISTRICT SARGODHA, PAKISTAN ONLY */}
+      <section
+        id="coverage-section"
+        className="py-16 bg-gradient-to-b from-white via-orange-50/30 to-emerald-50/30 border-b border-slate-200"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          {/* Coverage Header */}
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-black uppercase tracking-wider">
+                <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+                <span>Coverage Network</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-black text-slate-950 tracking-tight">
+                Licensed PTA CVAS District Coverage
+              </h2>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-600 text-white font-black text-base sm:text-lg shadow-md">
+                <MapPin className="w-5 h-5 text-yellow-200 shrink-0" />
+                <span>District Sargodha, Pakistan only</span>
+              </div>
+              <p className="text-sm text-slate-600 max-w-2xl pt-1">
+                Citrus Pvt Ltd operates dedicated 10G GPON Optical Fiber rings exclusively across{' '}
+                <strong className="text-slate-900">District Sargodha, Pakistan</strong>. Click any Sargodha sector below to inspect live OLT node health or register a complaint.
+              </p>
+            </div>
+
+            {/* Interactive Sector Search Filter */}
+            <div className="w-full lg:w-80">
+              <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
+                Check Your Sargodha Area / Colony:
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={zoneSearch}
+                  onChange={(e) => setZoneSearch(e.target.value)}
+                  placeholder="e.g. Satellite Town, University Rd, Model Town..."
+                  className="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-white border-2 border-slate-200 focus:border-orange-500 text-xs font-medium text-slate-900 focus:outline-none shadow-xs"
+                />
+                <Search className="w-4 h-4 text-orange-500 absolute left-3 top-3" />
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Sargodha Zones Grid + Live Selected Node Inspector */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Clickable Sector Cards (7 cols) */}
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {filteredZones.map((zone) => {
+                const isActive = selectedZone.id === zone.id;
+                return (
+                  <button
+                    key={zone.id}
+                    type="button"
+                    onClick={() => setSelectedZone(zone)}
+                    className={`text-left p-5 rounded-3xl transition-all cursor-pointer border-2 relative overflow-hidden group ${
+                      isActive
+                        ? 'bg-white border-orange-500 shadow-xl ring-4 ring-orange-500/15 -translate-y-0.5'
+                        : 'bg-white/90 hover:bg-white border-slate-200/90 hover:border-amber-300 shadow-xs'
+                    }`}
+                  >
+                    <div
+                      className={`h-1.5 w-full absolute top-0 left-0 bg-gradient-to-r ${zone.color}`}
+                    />
+                    <div className="flex items-start justify-between gap-2 mb-2 pt-1">
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${zone.badgeBg}`}
+                      >
+                        {zone.status}
+                      </span>
+                      <span className="font-mono text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                        {zone.pingMs}
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-black text-slate-950 group-hover:text-orange-600 transition-colors">
+                      {zone.name}
+                    </h4>
+                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">{zone.blocks}</p>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Interactive Selected Sargodha Node Telemetry Card (5 cols) */}
+            <div className="lg:col-span-5 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white rounded-3xl p-6 sm:p-7 shadow-2xl border-2 border-emerald-500/30 space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 block">
+                    Live Sargodha Fiber Node Telemetry
+                  </span>
+                  <h3 className="text-lg font-black text-white mt-0.5">{selectedZone.name}</h3>
+                </div>
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black shadow-lg">
+                  <Wifi className="w-6 h-6" />
+                </div>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                  <span className="text-slate-400">Licensed Jurisdiction:</span>
+                  <span className="font-black text-amber-300">District Sargodha, Pakistan only</span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                  <span className="text-slate-400">Active OLT Distribution Rack:</span>
+                  <span className="font-mono font-bold text-white">{selectedZone.oltNode}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3.5 rounded-2xl bg-emerald-950/60 border border-emerald-700/50">
+                    <span className="text-[10px] uppercase font-bold text-emerald-300 block">
+                      Optical Rx Power
+                    </span>
+                    <span className="font-mono font-black text-sm text-white mt-0.5 block">
+                      {selectedZone.opticalSignal}
+                    </span>
+                  </div>
+                  <div className="p-3.5 rounded-2xl bg-amber-950/60 border border-amber-700/50">
+                    <span className="text-[10px] uppercase font-bold text-amber-300 block">
+                      Sargodha Core Latency
+                    </span>
+                    <span className="font-mono font-black text-sm text-white mt-0.5 block">
+                      {selectedZone.pingMs} (PIE Peering)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
+                  <span className="text-slate-400 block mb-1">Covered Localities & Streets:</span>
+                  <span className="text-slate-200 font-medium">{selectedZone.blocks}</span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRegAddress(selectedZone.name + ', Sargodha');
+                    setCustomerAuthTab('register_gmail');
+                    setPageView('customer_auth');
+                  }}
+                  className="flex-1 py-3 px-4 rounded-xl font-black text-xs text-slate-950 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Register Gmail in This Area</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLodgeDistrict('Sargodha');
+                    setLodgeDescription(`Area: ${selectedZone.name}, District Sargodha — `);
+                    setShowQuickLodgeModal(true);
+                  }}
+                  className="py-3 px-4 rounded-xl font-bold text-xs text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all cursor-pointer"
+                >
+                  Lodge Area Fault
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. THREE-STEP COLORFUL PROCESS */}
+      <section className="py-14 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-xs font-black uppercase text-emerald-800 tracking-wider mb-1">
+            <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-black uppercase tracking-wider">
               100% Private & Cloud Protected
-            </h2>
-            <h3 className="text-2xl font-bold text-slate-950 tracking-tight">
-              How Customer Gmail Registration & Cloud History Work
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-2">
+              How Sargodha Customer Complaint Tracking Works
             </h3>
             <p className="text-sm text-slate-600 mt-2">
-              Every customer has a private account linked to their Gmail. Only you can view your complaint history.
+              Every customer has a private account linked to their Gmail. You see only your own complaint status — nothing else.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-emerald-400 transition-all shadow-xs relative">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-lg mb-4">
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-emerald-50 via-teal-50/50 to-white border-2 border-emerald-200 hover:border-emerald-400 transition-all shadow-sm relative">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-black text-lg mb-4 shadow-md">
                 1
               </div>
-              <h4 className="text-base font-bold text-slate-950 mb-2">Register with Your Gmail</h4>
+              <h4 className="text-base font-black text-slate-950 mb-2">Sign In with Your Gmail</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Click the top button to sign in with Google or register your Gmail address. Your account is strictly private and isolated to you.
+                Click the top button to sign in with Google or register your Gmail address in District Sargodha. Your account is strictly private.
               </p>
-              <div className="mt-4 text-[11px] font-bold text-emerald-700 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+              <div className="mt-4 text-[11px] font-extrabold text-emerald-800 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Private Google Cloud Account</span>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-orange-400 transition-all shadow-xs relative">
-              <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-800 flex items-center justify-center font-black text-lg mb-4">
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-50 via-orange-50/50 to-white border-2 border-amber-200 hover:border-orange-400 transition-all shadow-sm relative">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-slate-950 flex items-center justify-center font-black text-lg mb-4 shadow-md">
                 2
               </div>
-              <h4 className="text-base font-bold text-slate-950 mb-2">Lodge Fault & Cloud Backup</h4>
+              <h4 className="text-base font-black text-slate-950 mb-2">Lodge Fault & Cloud Sync</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Submit fiber cut, red LOS light, or speed complaints. Every ticket is saved to Google Cloud Firestore under your Gmail account.
+                Submit fiber cut, red LOS light, or slow speed complaints. Every ticket is saved to Google Cloud Firestore under your Gmail.
               </p>
-              <div className="mt-4 text-[11px] font-bold text-orange-700 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Permanent Cloud Complaint History</span>
+              <div className="mt-4 text-[11px] font-extrabold text-orange-800 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-orange-600" />
+                <span>24/7 Helpline: 03390480022</span>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-teal-400 transition-all shadow-xs relative">
-              <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center font-black text-lg mb-4">
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-purple-50 via-indigo-50/50 to-white border-2 border-purple-200 hover:border-purple-400 transition-all shadow-sm relative">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-black text-lg mb-4 shadow-md">
                 3
               </div>
-              <h4 className="text-base font-bold text-slate-950 mb-2">Live NOC ACK & Updates</h4>
+              <h4 className="text-base font-black text-slate-950 mb-2">Live Complaint Status</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Citrus NOC engineers acknowledge (ACK) your complaint within 15 minutes, assign field splicers, and update status in real time.
+                Citrus Sargodha NOC engineers acknowledge (ACK) your complaint, dispatch field splicers, and update your complaint status live.
               </p>
-              <div className="mt-4 text-[11px] font-bold text-teal-700 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Real-time Status & Resolution SLA</span>
+              <div className="mt-4 text-[11px] font-extrabold text-purple-800 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-purple-600" />
+                <span>Fast Sargodha Field Dispatch</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. INSTANT TICKET TRACKING SECTION */}
-      <section id="track-section" className="py-12 bg-slate-100 border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-md">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <div>
-                <span className="text-[10px] font-black text-amber-800 uppercase bg-amber-100 px-2 py-0.5 rounded">
-                  Ticket Reference Lookup
-                </span>
-                <h3 className="text-xl font-black text-slate-950 mt-1">
-                  Track Complaint by Ticket Reference
-                </h3>
-                <p className="text-xs text-slate-600">
-                  Enter your specific ticket reference number to check NOC acknowledgment and field status
-                </p>
-              </div>
+      {/* 6. INSTANT TICKET TRACKING SECTION + INTERACTIVE FAQ */}
+      <section id="track-section" className="py-14 bg-slate-100/80 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left: Ticket Lookup Box (7 cols) */}
+          <div className="lg:col-span-7 bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-lg">
+            <div className="mb-6">
+              <span className="text-[10px] font-black text-amber-900 uppercase bg-amber-100 border border-amber-300 px-2.5 py-1 rounded-full">
+                Instant Ticket Status Lookup
+              </span>
+              <h3 className="text-2xl font-black text-slate-950 mt-2">
+                Track Your Complaint Status
+              </h3>
+              <p className="text-xs text-slate-600 mt-1">
+                Enter your official ticket reference number to check your current complaint status
+              </p>
             </div>
 
             <form onSubmit={handlePerformTrack} className="flex flex-col sm:flex-row gap-3">
@@ -1039,30 +1601,30 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   type="text"
                   value={trackQuery}
                   onChange={(e) => setTrackQuery(e.target.value)}
-                  placeholder="Enter Your Ticket # (e.g. PTA-FSD-2026-XXXX)"
-                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-50 border border-slate-300 focus:border-amber-500 text-sm font-mono uppercase text-slate-900 focus:outline-none"
+                  placeholder="Enter Ticket # (e.g. PTA-SGD-2026-0041)"
+                  className="w-full pl-10 pr-4 py-3.5 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-orange-500 text-sm font-mono uppercase text-slate-900 focus:outline-none"
                 />
-                <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                <Search className="w-5 h-5 text-orange-500 absolute left-3.5 top-3.5" />
               </div>
               <button
                 type="submit"
-                className="px-6 py-3 rounded-2xl font-black text-xs sm:text-sm text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                className="px-6 py-3.5 rounded-2xl font-black text-xs sm:text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>Track Status</span>
+                <span>Check Status</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
 
             {trackError && (
-              <div className="mt-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+              <div className="mt-4 p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
                 <span>{trackError}</span>
               </div>
             )}
 
             {trackedTicket && (
-              <div className="mt-6 p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+              <div className="mt-6 p-5 rounded-2xl bg-gradient-to-br from-emerald-50/70 to-white border-2 border-emerald-200 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-100 pb-3">
                   <div>
                     <span className="font-mono font-black text-base text-slate-950">
                       {trackedTicket.ticketNumber}
@@ -1072,7 +1634,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                     </span>
                   </div>
                   <span
-                    className={`px-2.5 py-1 rounded-full text-xs font-black ${
+                    className={`px-3 py-1 rounded-full text-xs font-black ${
                       trackedTicket.status === 'RESOLVED' || trackedTicket.status === 'CLOSED'
                         ? 'bg-emerald-100 text-emerald-800'
                         : trackedTicket.status === 'IN_PROGRESS'
@@ -1084,16 +1646,16 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   </span>
                 </div>
 
-                <div className="text-xs text-slate-700">
-                  <span className="font-bold text-slate-900">{trackedTicket.subject}</span>
+                <div className="text-xs text-slate-800 font-bold">
+                  {trackedTicket.subject}
                 </div>
 
                 {trackedTicket.latestOnlineUpdate && (
-                  <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
-                    <span className="text-[11px] text-emerald-800 font-bold block mb-0.5">
-                      Status Update:
+                  <div className="p-3 rounded-xl bg-emerald-100/70 border border-emerald-300 text-xs">
+                    <span className="text-[11px] text-emerald-900 font-black block mb-0.5">
+                      Latest Status Update:
                     </span>
-                    <p className="text-emerald-950 font-medium">
+                    <p className="text-emerald-950 font-semibold">
                       {trackedTicket.latestOnlineUpdate}
                     </p>
                   </div>
@@ -1101,88 +1663,119 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               </div>
             )}
           </div>
-        </div>
-      </section>
 
-      {/* 5. NETWORK COVERAGE & LICENSED DISTRICTS */}
-      <section className="py-12 bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-              <span className="text-xs font-extrabold uppercase text-slate-400">
-                Coverage Network
-              </span>
-              <h3 className="text-2xl font-bold text-slate-950 mt-1">
-                Licensed PTA CVAS District Coverage
+          {/* Right: Interactive Quick Support & FAQ Accordion (5 cols) */}
+          <div className="lg:col-span-5 space-y-3">
+            <div className="flex items-center gap-2 mb-2">
+              <HelpCircle className="w-5 h-5 text-orange-600" />
+              <h3 className="text-lg font-black text-slate-950">
+                Sargodha Subscriber Support FAQ
               </h3>
-              <p className="text-sm text-slate-600 mt-1">
-                Faisalabad Telecom Region & Connected Punjab Nodes
-              </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-extrabold flex items-center gap-1.5">
-                <Radio className="w-3.5 h-3.5 text-emerald-600" />
-                Faisalabad (Primary Hub)
-              </span>
-              <span className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 text-xs font-bold">
-                Lahore Metro
-              </span>
-              <span className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 text-xs font-bold">
-                Multan City
-              </span>
-              <span className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 text-xs font-bold">
-                Rawalpindi / Islamabad
-              </span>
-            </div>
+            {[
+              {
+                q: 'What is the Coverage Area of Citrus Pvt Ltd?',
+                a: 'Citrus Pvt Ltd is licensed under PTA CVAS for District Sargodha, Pakistan only. We cover Satellite Town, University Road, Model Town, Civil Lines, Cantt, Queens Road, and surrounding Sargodha sectors.',
+              },
+              {
+                q: 'How can I contact the 24/7 NOC Helpline & Support?',
+                a: 'You can call or WhatsApp our 24/7 NOC Helpline & support number at 03390480022 or email us anytime at support.citrus@gmail.com.',
+              },
+              {
+                q: 'Is my complaint history private when I sign in with Gmail?',
+                a: 'Yes! Your Gmail account is strictly isolated. Customers can only see their own complaint status and nothing else.',
+              },
+            ].map((item, idx) => {
+              const isOpen = openFaqIndex === idx;
+              return (
+                <div
+                  key={idx}
+                  className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                    className="w-full px-5 py-4 text-left flex items-center justify-between gap-3 text-xs font-black text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
+                  >
+                    <span>{item.q}</span>
+                    {isOpen ? (
+                      <ChevronUp className="w-4 h-4 text-orange-600 shrink-0" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                    )}
+                  </button>
+                  {isOpen && (
+                    <div className="px-5 pb-4 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* 6. VERY BOTTOM FOOTER: CONTAINS THE DISCREET SEPARATE STAFF & ADMIN LOGIN BUTTON */}
-      <footer className="bg-slate-900 text-slate-400 text-xs pt-10 pb-8 border-t border-slate-800">
+      {/* 7. FOOTER WITH UPDATED SARGODHA COVERAGE, 03390480022 HELPLINE, AND SUPPORT.CITRUS@GMAIL.COM */}
+      <footer className="bg-slate-950 text-slate-400 text-xs pt-12 pb-8 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-800">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-white font-black text-lg">
-                <div className="w-7 h-7 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-black text-sm">
+            {/* Col 1: Brand & Sargodha Coverage */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2.5 text-white font-black text-lg">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-400 text-slate-950 flex items-center justify-center font-black text-sm shadow-md">
                   C
                 </div>
                 <span>Citrus Pvt Ltd</span>
               </div>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Class Value Added Services (CVAS-Data) License Holder. Providing high-speed optical fiber network, metro ethernet, and enterprise broadband infrastructure.
+                Licensed PTA CVAS District Coverage: <strong className="text-amber-300">District Sargodha, Pakistan only</strong>. Providing high-speed optical fiber FTTH internet and enterprise broadband infrastructure.
               </p>
             </div>
 
-            <div className="space-y-2">
+            {/* Col 2: Customer Support (Updated Helpline & Email, PTA Escalation Removed) */}
+            <div className="space-y-2.5">
               <span className="text-xs font-extrabold text-white uppercase tracking-wider block">
-                Customer Support
+                24/7 NOC Helpline & Customer Support
               </span>
-              <div className="space-y-1">
-                <div>
-                  24/7 Helpline:{' '}
-                  <span className="text-slate-200 font-mono font-bold">041-111-248-787</span>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <PhoneCall className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>24/7 NOC Helpline & Support:</span>
+                  <a
+                    href="tel:03390480022"
+                    className="text-amber-300 font-mono font-black text-sm hover:underline"
+                  >
+                    03390480022
+                  </a>
                 </div>
-                <div>
-                  Support Email:{' '}
-                  <span className="text-slate-200 font-mono">support@citrus.net.pk</span>
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Support Email:</span>
+                  <a
+                    href="mailto:support.citrus@gmail.com"
+                    className="text-emerald-300 font-mono font-bold hover:underline"
+                  >
+                    support.citrus@gmail.com
+                  </a>
                 </div>
-                <div>
-                  PTA Escalation:{' '}
-                  <span className="text-slate-200 font-mono">compliance@citrus.net.pk</span>
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-orange-400 shrink-0" />
+                  <span>Coverage Network:</span>
+                  <span className="text-slate-200 font-bold">District Sargodha, Pakistan only</span>
                 </div>
               </div>
             </div>
 
             {/* Col 3: VERY BOTTOM STAFF & ADMIN PORTAL BUTTON */}
-            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+            <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
               <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
                 <Lock className="w-4 h-4" />
                 <span>Citrus Internal Staff & NOC Gateway</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                For Citrus NOC Engineers, Linemen, and Administrators only. Staff credentials are created by the System Administrator.
+                For Citrus NOC Engineers, Linemen, and Administrators in District Sargodha. Staff credentials are created by the System Administrator.
               </p>
               <button
                 onClick={() => setPageView('staff_auth')}
@@ -1199,7 +1792,9 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             <div>
               © 2026 Citrus Pvt Ltd. All rights reserved. Regulated by Pakistan Telecommunication Authority (PTA).
             </div>
-            <div>Telecom District: Faisalabad CVAS</div>
+            <div className="text-amber-400/90 font-bold">
+              Licensed PTA CVAS District Coverage: District Sargodha, Pakistan only
+            </div>
           </div>
         </div>
       </footer>
@@ -1207,20 +1802,24 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
       {/* QUICK LODGE MODAL */}
       {showQuickLodgeModal && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border-2 border-amber-400/40">
             <button
               onClick={() => {
                 setShowQuickLodgeModal(false);
                 setQuickLodgeSuccessTicket(null);
               }}
-              className="absolute right-5 top-5 text-slate-400 hover:text-slate-700 text-lg font-bold"
+              className="absolute right-5 top-5 text-slate-400 hover:text-slate-700 text-lg font-bold cursor-pointer"
             >
               ✕
             </button>
 
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black uppercase mb-2">
+              <MapPin className="w-3 h-3 text-orange-600" />
+              <span>District Sargodha, Pakistan Only</span>
+            </div>
             <h3 className="text-xl font-black text-slate-950 mb-1">Express Complaint Registration</h3>
             <p className="text-xs text-slate-500 mb-5">
-              Quickly log a fiber fault for urgent NOC acknowledgment
+              Quickly log a fiber fault in District Sargodha · 24/7 Helpline: 03390480022
             </p>
 
             {quickLodgeSuccessTicket ? (
@@ -1233,14 +1832,14 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   Ticket #: {quickLodgeSuccessTicket.ticketNumber}
                 </div>
                 <p className="text-xs text-slate-600">
-                  Citrus NOC team has received this ticket and will acknowledge within 15 minutes.
+                  Citrus Sargodha NOC team has received your complaint. For urgent support call <strong>03390480022</strong>.
                 </p>
                 <button
                   onClick={() => {
                     setShowQuickLodgeModal(false);
                     setQuickLodgeSuccessTicket(null);
                   }}
-                  className="px-5 py-2 bg-slate-900 text-white font-bold text-xs rounded-xl"
+                  className="px-5 py-2 bg-slate-900 text-white font-bold text-xs rounded-xl cursor-pointer"
                 >
                   Close
                 </button>
@@ -1272,17 +1871,13 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">District *</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Licensed District *</label>
                     <select
                       value={lodgeDistrict}
                       onChange={(e) => setLodgeDistrict(e.target.value as DistrictName)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-amber-500"
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-900"
                     >
-                      <option value="Faisalabad">Faisalabad</option>
-                      <option value="Lahore">Lahore</option>
-                      <option value="Multan">Multan</option>
-                      <option value="Rawalpindi">Rawalpindi</option>
-                      <option value="Islamabad">Islamabad</option>
+                      <option value="Sargodha">District Sargodha, Pakistan</option>
                     </select>
                   </div>
                 </div>
@@ -1304,14 +1899,14 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Fault Description & Location *
+                    Fault Description & Sargodha Address *
                   </label>
                   <textarea
                     rows={3}
                     required
                     value={lodgeDescription}
                     onChange={(e) => setLodgeDescription(e.target.value)}
-                    placeholder="Describe problem, street address, or OTDR reading..."
+                    placeholder="Describe problem and your street/sector in District Sargodha..."
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-amber-500"
                   />
                 </div>

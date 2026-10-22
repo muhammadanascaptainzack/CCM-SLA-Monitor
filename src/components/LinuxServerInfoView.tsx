@@ -45,7 +45,7 @@ Restart=always
 RestartSec=10
 Environment=NODE_ENV=production
 Environment=PORT=4000
-Environment=PTA_DISTRICT=Faisalabad
+Environment=PTA_DISTRICT=Sargodha
 
 # Hardening
 ProtectSystem=full

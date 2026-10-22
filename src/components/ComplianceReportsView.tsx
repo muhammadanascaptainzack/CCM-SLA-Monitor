@@ -27,7 +27,7 @@ export const ComplianceReportsView: React.FC<ComplianceReportsViewProps> = ({
 }) => {
   const [selectedMonth, setSelectedMonth] = useState('October 2026');
   const [selectedDistrict, setSelectedDistrict] = useState<DistrictName>(
-    report?.district || 'Faisalabad'
+    report?.district || 'Sargodha'
   );
 
   const handlePeriodChange = (month: string, district: DistrictName) => {
@@ -76,12 +76,7 @@ export const ComplianceReportsView: React.FC<ComplianceReportsViewProps> = ({
               onChange={(e) => handlePeriodChange(selectedMonth, e.target.value as DistrictName)}
               className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-md text-slate-800 font-medium focus:outline-none"
             >
-              <option value="Faisalabad">District Faisalabad</option>
-              <option value="Rawalpindi">District Rawalpindi</option>
-              <option value="Lahore">District Lahore</option>
-              <option value="Peshawar">District Peshawar</option>
-              <option value="Multan">District Multan</option>
-              <option value="Gujranwala">District Gujranwala</option>
+              <option value="Sargodha">District Sargodha, Pakistan Only</option>
             </select>
           </div>
 

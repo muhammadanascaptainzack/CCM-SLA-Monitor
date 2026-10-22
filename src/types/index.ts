@@ -1,6 +1,7 @@
 export type UserRole = 'customer' | 'support_agent' | 'technician' | 'compliance_officer' | 'admin';
 
 export type DistrictName = 
+  | 'Sargodha'
   | 'Faisalabad'
   | 'Rawalpindi'
   | 'Lahore'

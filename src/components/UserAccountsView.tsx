@@ -16,10 +16,10 @@ export const UserAccountsView: React.FC<UserAccountsViewProps> = ({ users, onCre
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('0300-');
-  const [cnic, setCnic] = useState('33100-');
+  const [cnic, setCnic] = useState('38403-');
   const [role, setRole] = useState<UserRole>('customer');
   const [circuitId, setCircuitId] = useState('');
-  const [district, setDistrict] = useState<DistrictName>('Faisalabad');
+  const [district, setDistrict] = useState<DistrictName>('Sargodha');
   const [areaAddress, setAreaAddress] = useState('');
   const [bandwidthPlan, setBandwidthPlan] = useState('50 Mbps Fiber Unlimited');
   const [connectionType, setConnectionType] = useState<'FTTH' | 'GPON' | 'Wireless P2P' | 'Copper DSL'>('FTTH');
@@ -276,7 +276,7 @@ export const UserAccountsView: React.FC<UserAccountsViewProps> = ({ users, onCre
                         type="text"
                         value={circuitId}
                         onChange={(e) => setCircuitId(e.target.value)}
-                        placeholder="PK-FSD-XXXX"
+                        placeholder="PK-SGD-XXXX"
                         className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white text-slate-900 font-mono"
                       />
                     </div>
@@ -287,22 +287,18 @@ export const UserAccountsView: React.FC<UserAccountsViewProps> = ({ users, onCre
                         onChange={(e) => setDistrict(e.target.value as DistrictName)}
                         className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white text-slate-900"
                       >
-                        <option value="Faisalabad">Faisalabad</option>
-                        <option value="Rawalpindi">Rawalpindi</option>
-                        <option value="Lahore">Lahore</option>
-                        <option value="Peshawar">Peshawar</option>
-                        <option value="Multan">Multan</option>
+                        <option value="Sargodha">District Sargodha, Pakistan Only</option>
                       </select>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Address / Tehsil</label>
+                    <label className="block text-slate-700 font-semibold mb-1">Address / Sector in Sargodha</label>
                     <input
                       type="text"
                       value={areaAddress}
                       onChange={(e) => setAreaAddress(e.target.value)}
-                      placeholder="e.g. Block C, Gulberg, Faisalabad"
+                      placeholder="e.g. Block C, Satellite Town, Sargodha"
                       className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white text-slate-900"
                     />
                   </div>
