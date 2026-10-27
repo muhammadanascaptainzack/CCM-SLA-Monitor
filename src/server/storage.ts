@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { ComplaintTicket, User, PTALicenseeConfig, ComplaintCategory, ComplaintPriority, DistrictName } from '../types/index.js';
+import { ComplaintTicket, User, PTALicenseeConfig, ComplaintCategory, ComplaintPriority, DistrictName, SargodhaCoverageZone } from '../types/index.js';
 
 interface DatabaseSchema {
   config: PTALicenseeConfig;
@@ -11,9 +11,78 @@ interface DatabaseSchema {
 const DATA_DIR = path.resolve(process.cwd(), 'data');
 const DB_FILE = path.resolve(DATA_DIR, 'complaints-db.json');
 
+export const DEFAULT_SARGODHA_ZONES: SargodhaCoverageZone[] = [
+  {
+    id: 'satellite-town',
+    name: 'Satellite Town (Blocks A, B, C, D & X, Y, Z)',
+    blocks: 'Main Commercial Market, Block A–Z Residential Sectors',
+    oltNode: 'SGD-OLT-01 (Huawei MA5800 X7)',
+    status: 'Active GPON Fiber',
+    opticalSignal: '-18.4 dBm (Optimal)',
+    pingMs: '4 ms',
+    color: 'from-emerald-500 to-teal-600',
+    badgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+  },
+  {
+    id: 'university-road',
+    name: 'University Road & UOS Campus Corridor',
+    blocks: 'University of Sargodha, Khayaban-e-Sadiq, New Satellite Town',
+    oltNode: 'SGD-OLT-02 (Core Ring North)',
+    status: 'High-Speed FTTH',
+    opticalSignal: '-19.1 dBm (Optimal)',
+    pingMs: '5 ms',
+    color: 'from-orange-500 to-amber-500',
+    badgeBg: 'bg-orange-100 text-orange-900 border-orange-300',
+  },
+  {
+    id: 'model-town',
+    name: 'Model Town, Civil Lines & Club Road',
+    blocks: 'Civil Lines, District Courts, Club Road, Officer Colony',
+    oltNode: 'SGD-OLT-03 (Metro Core)',
+    status: 'Active GPON Fiber',
+    opticalSignal: '-18.8 dBm (Optimal)',
+    pingMs: '4 ms',
+    color: 'from-sky-500 to-indigo-600',
+    badgeBg: 'bg-sky-100 text-sky-900 border-sky-300',
+  },
+  {
+    id: 'queens-cantt',
+    name: 'Queens Road, Cantt & PAF Road Commercial',
+    blocks: 'Cantt Plaza, Queens Road, Katchery Bazaar, Trust Plaza',
+    oltNode: 'SGD-OLT-04 (Enterprise CIR Node)',
+    status: 'High-Speed FTTH',
+    opticalSignal: '-17.9 dBm (Optimal)',
+    pingMs: '3 ms',
+    color: 'from-purple-600 to-fuchsia-600',
+    badgeBg: 'bg-purple-100 text-purple-900 border-purple-300',
+  },
+  {
+    id: 'faisalabad-lahore-rd',
+    name: 'Faisalabad Road, Lahore Road & Industrial Zone',
+    blocks: 'Chak 47 NB, Silanwali Road, Citrus Processing Zone, 49 Tail',
+    oltNode: 'SGD-OLT-05 (Industrial Feeder)',
+    status: 'Active GPON Fiber',
+    opticalSignal: '-19.6 dBm (Optimal)',
+    pingMs: '6 ms',
+    color: 'from-rose-500 to-orange-500',
+    badgeBg: 'bg-rose-100 text-rose-900 border-rose-300',
+  },
+  {
+    id: 'khushab-bhalwal',
+    name: 'Khushab Road, Bhalwal & Kot Momin Link',
+    blocks: 'Fatima Jinnah Road, Eidgah Road, Ispahani Town, Bhalwal Feeder',
+    oltNode: 'SGD-OLT-06 (District Ring West)',
+    status: 'High-Speed FTTH',
+    opticalSignal: '-19.3 dBm (Optimal)',
+    pingMs: '5 ms',
+    color: 'from-teal-500 to-cyan-600',
+    badgeBg: 'bg-teal-100 text-teal-900 border-teal-300',
+  },
+];
+
 const INITIAL_CONFIG: PTALicenseeConfig = {
   licenseeName: 'Citrus Pvt Ltd',
-  licenseNumber: 'CVAS-DATA/DIST-SGD/CITRUS-2024',
+  licenseNumber: 'Class/Internet/11/2026/Sargodha',
   licenseType: 'District CVAS (Class Value Added Services - Data & Internet)',
   registeredDistrict: 'Sargodha',
   regionalPtaOffice: 'PTA Zonal Office, Sargodha / Lahore Region',
@@ -21,6 +90,8 @@ const INITIAL_CONFIG: PTALicenseeConfig = {
   complianceOfficerEmail: 'support.citrus@gmail.com',
   complianceOfficerPhone: '03390480022',
   emergencyNocHelpline: '03390480022',
+  coverageHeadline: 'District Sargodha, Pakistan only',
+  coverageZones: DEFAULT_SARGODHA_ZONES,
 };
 
 const INITIAL_USERS: User[] = [
@@ -463,22 +534,48 @@ class StorageManager {
         const parsed = JSON.parse(content);
         if (parsed.tickets && parsed.users && parsed.config) {
           let updated = false;
-          if (
-            parsed.config.registeredDistrict !== 'Sargodha' ||
-            parsed.config.emergencyNocHelpline !== '03390480022' ||
-            parsed.config.complianceOfficerEmail === 'compliance@citrus.net.pk'
-          ) {
+          if (parsed.config.registeredDistrict !== 'Sargodha') {
             parsed.config.registeredDistrict = 'Sargodha';
-            parsed.config.licenseNumber = 'CVAS-DATA/DIST-SGD/CITRUS-2024';
+            updated = true;
+          }
+          if (
+            !parsed.config.licenseNumber ||
+            parsed.config.licenseNumber === 'CVAS-DATA/DIST-SGD/CITRUS-2024' ||
+            parsed.config.licenseNumber === 'CITRUS-2024' ||
+            parsed.config.licenseNumber === 'CVAS-DATA/DIST-FSD/2024-819' ||
+            parsed.config.licenseNumber === 'CVAS-DATA/DIST-FSD/CITRUS-2024'
+          ) {
+            parsed.config.licenseNumber = 'Class/Internet/11/2026/Sargodha';
+            updated = true;
+          }
+          if (
+            !parsed.config.emergencyNocHelpline ||
+            parsed.config.emergencyNocHelpline === '0800-78200' ||
+            parsed.config.emergencyNocHelpline === '041-111-248-787'
+          ) {
             parsed.config.emergencyNocHelpline = '03390480022';
             parsed.config.complianceOfficerPhone = '03390480022';
+            updated = true;
+          }
+          if (
+            !parsed.config.complianceOfficerEmail ||
+            parsed.config.complianceOfficerEmail === 'compliance@citrus.net.pk'
+          ) {
             parsed.config.complianceOfficerEmail = 'support.citrus@gmail.com';
+            updated = true;
+          }
+          if (!parsed.config.coverageHeadline) {
+            parsed.config.coverageHeadline = 'District Sargodha, Pakistan only';
+            updated = true;
+          }
+          if (!parsed.config.coverageZones || !Array.isArray(parsed.config.coverageZones) || parsed.config.coverageZones.length === 0) {
+            parsed.config.coverageZones = DEFAULT_SARGODHA_ZONES;
             updated = true;
           }
           for (const u of parsed.users) {
             if (u.email === 'compliance@citrus.net.pk') {
               u.email = 'support.citrus@gmail.com';
-              u.phone = '03390480022';
+              u.phone = parsed.config.emergencyNocHelpline || '03390480022';
               updated = true;
             }
             if (u.district !== 'Sargodha') {
@@ -542,7 +639,14 @@ class StorageManager {
   }
 
   public updateConfig(newConfig: Partial<PTALicenseeConfig>): PTALicenseeConfig {
-    this.data.config = { ...this.data.config, ...newConfig };
+    const updatedConfig: PTALicenseeConfig = {
+      ...this.data.config,
+      ...newConfig,
+    };
+    if (newConfig.emergencyNocHelpline !== undefined && newConfig.complianceOfficerPhone === undefined) {
+      updatedConfig.complianceOfficerPhone = newConfig.emergencyNocHelpline;
+    }
+    this.data.config = updatedConfig;
     this.saveDatabase();
     return this.data.config;
   }

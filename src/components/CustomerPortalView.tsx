@@ -15,12 +15,13 @@ import {
   UserPlus,
   Radio
 } from 'lucide-react';
-import { ComplaintTicket, User as UserType, ComplaintCategory, ComplaintPriority, DistrictName } from '../types/index.js';
+import { ComplaintTicket, User as UserType, ComplaintCategory, ComplaintPriority, DistrictName, PTALicenseeConfig } from '../types/index.js';
 
 interface CustomerPortalViewProps {
   users: UserType[];
   tickets: ComplaintTicket[];
   currentCustomer: UserType | null;
+  config?: PTALicenseeConfig | null;
   onSelectCustomer: (user: UserType) => void;
   onCreateCustomer: (userData: Partial<UserType>) => Promise<UserType>;
   onSubmitComplaint: (data: {
@@ -39,6 +40,7 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
   users,
   tickets,
   currentCustomer,
+  config,
   onSelectCustomer,
   onCreateCustomer,
   onSubmitComplaint,
@@ -63,6 +65,9 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
   const activeCustomer = currentCustomer;
+  const activeHelpline = config?.emergencyNocHelpline || '03390480022';
+  const activeEmail = config?.complianceOfficerEmail || 'support.citrus@gmail.com';
+  const activeCoverage = config?.coverageHeadline || 'District Sargodha, Pakistan only';
 
   // Strictly filter complaints for ONLY the currently logged-in customer
   const customerTickets = tickets.filter(
@@ -116,7 +121,7 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
         <div>
           <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-300 mb-1.5">
             <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black uppercase text-[10px]">
-              District Sargodha, Pakistan Only
+              {activeCoverage}
             </span>
             <span className="font-bold text-emerald-200">PRIVATE GMAIL SUBSCRIBER PORTAL</span>
           </div>
@@ -127,13 +132,13 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
             Lodge fiber service complaints and check your personal complaint status privately linked to your Gmail account.
           </p>
           <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-amber-300 font-mono font-bold">
-            <a href="tel:03390480022" className="hover:underline flex items-center gap-1">
+            <a href={`tel:${activeHelpline}`} className="hover:underline flex items-center gap-1">
               <Phone className="w-3.5 h-3.5 text-amber-400" />
-              <span>24/7 NOC Helpline: 03390480022</span>
+              <span>24/7 NOC Helpline: {activeHelpline}</span>
             </a>
             <span>·</span>
-            <a href="mailto:support.citrus@gmail.com" className="hover:underline text-emerald-300">
-              support.citrus@gmail.com
+            <a href={`mailto:${activeEmail}`} className="hover:underline text-emerald-300">
+              {activeEmail}
             </a>
           </div>
         </div>

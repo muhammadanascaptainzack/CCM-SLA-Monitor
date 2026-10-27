@@ -39,6 +39,7 @@ import {
   ComplaintTicket,
   ComplaintCategory,
   ComplaintPriority,
+  PTALicenseeConfig,
 } from '../types/index.js';
 import {
   signInCustomerWithGoogle,
@@ -49,6 +50,7 @@ import {
 interface FrontPortalLoginProps {
   users: UserType[];
   tickets: ComplaintTicket[];
+  config?: PTALicenseeConfig | null;
   onLoginCustomer: (customer: UserType, firebaseUid?: string) => void;
   onLoginStaff: (staff: UserType) => void;
   onCreateCustomer: (userData: Partial<UserType>) => Promise<UserType>;
@@ -199,6 +201,7 @@ const DIAGNOSTIC_PRESETS: {
 export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   users,
   tickets,
+  config,
   onLoginCustomer,
   onLoginStaff,
   onCreateCustomer,
@@ -259,8 +262,18 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   const [isSubmittingQuickLodge, setIsSubmittingQuickLodge] = useState(false);
   const [quickLodgeSuccessTicket, setQuickLodgeSuccessTicket] = useState<ComplaintTicket | null>(null);
 
+  const activeHelpline = config?.emergencyNocHelpline || '03390480022';
+  const activeEmail = config?.complianceOfficerEmail || 'support.citrus@gmail.com';
+  const activeLicense = config?.licenseNumber || 'Class/Internet/11/2026/Sargodha';
+  const activeCoverageHeadline = config?.coverageHeadline || 'District Sargodha, Pakistan only';
+  const activeZones: SargodhaZone[] =
+    config?.coverageZones && config.coverageZones.length > 0
+      ? config.coverageZones
+      : SARGODHA_ZONES;
+
   // Interactive UI States for Landing Page
-  const [selectedZone, setSelectedZone] = useState<SargodhaZone>(SARGODHA_ZONES[0]);
+  const [selectedZoneId, setSelectedZoneId] = useState<string>(activeZones[0]?.id || SARGODHA_ZONES[0].id);
+  const selectedZone = activeZones.find((z) => z.id === selectedZoneId) || activeZones[0] || SARGODHA_ZONES[0];
   const [zoneSearch, setZoneSearch] = useState('');
   const [activeDiagIndex, setActiveDiagIndex] = useState<number>(0);
   const [copiedContact, setCopiedContact] = useState<'phone' | 'email' | null>(null);
@@ -272,7 +285,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
     setTimeout(() => setCopiedContact(null), 2200);
   };
 
-  const filteredZones = SARGODHA_ZONES.filter(
+  const filteredZones = activeZones.filter(
     (z) =>
       z.name.toLowerCase().includes(zoneSearch.toLowerCase()) ||
       z.blocks.toLowerCase().includes(zoneSearch.toLowerCase())
@@ -543,11 +556,11 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
           <div className="flex items-center gap-3">
             <a
-              href="tel:03390480022"
+              href={`tel:${activeHelpline}`}
               className="hidden sm:flex items-center gap-1.5 text-xs font-mono font-bold text-amber-300 bg-amber-950/60 border border-amber-700/50 px-3 py-1 rounded-full"
             >
               <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
-              <span>24/7 Helpline: 03390480022</span>
+              <span>24/7 Helpline: {activeHelpline}</span>
             </a>
             <div className="flex items-center gap-2">
               <CloudCheck className="w-4 h-4 text-emerald-400" />
@@ -888,7 +901,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
         {/* Footer info */}
         <div className="text-center py-4 text-xs text-slate-400 border-t border-slate-800/80">
-          Citrus Pvt Ltd · Licensed PTA CVAS District Sargodha, Pakistan · 24/7 Helpline: 03390480022 · support.citrus@gmail.com
+          Citrus Pvt Ltd · Licensed PTA CVAS ({activeLicense}) · {activeCoverageHeadline} · 24/7 Helpline: {activeHelpline} · {activeEmail}
         </div>
       </div>
     );
@@ -1021,28 +1034,28 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] uppercase tracking-wider">
               <Radio className="w-3 h-3 text-slate-950 animate-pulse" />
-              District Sargodha, Pakistan Only
+              {activeCoverageHeadline}
             </span>
             <span className="text-emerald-200 font-semibold hidden sm:inline">
-              Licensed PTA CVAS Optical Fiber Internet & Telecom Redressal Portal
+              Licensed PTA CVAS ({activeLicense}) Optical Fiber Internet Portal
             </span>
           </div>
 
           <div className="flex items-center gap-4 ml-auto">
             <a
-              href="tel:03390480022"
+              href={`tel:${activeHelpline}`}
               className="flex items-center gap-1.5 font-mono font-extrabold text-amber-300 hover:text-amber-200 transition-colors"
             >
               <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
-              <span>24/7 NOC Helpline: 03390480022</span>
+              <span>24/7 NOC Helpline: {activeHelpline}</span>
             </a>
             <span className="text-slate-600 hidden md:inline">|</span>
             <a
-              href="mailto:support.citrus@gmail.com"
+              href={`mailto:${activeEmail}`}
               className="hidden md:flex items-center gap-1.5 font-mono text-emerald-300 hover:text-white transition-colors"
             >
               <Mail className="w-3.5 h-3.5 text-emerald-400" />
-              <span>support.citrus@gmail.com</span>
+              <span>{activeEmail}</span>
             </a>
           </div>
         </div>
@@ -1064,7 +1077,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 font-semibold">
-                  High-Speed FTTH Fiber Broadband · District Sargodha, Pakistan
+                  High-Speed FTTH Fiber Broadband · {activeCoverageHeadline}
                 </p>
               </div>
             </div>
@@ -1076,10 +1089,10 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   24/7 NOC Helpline & Support
                 </span>
                 <a
-                  href="tel:03390480022"
+                  href={`tel:${activeHelpline}`}
                   className="font-mono font-black text-sm text-slate-900 hover:text-orange-600 transition-colors"
                 >
-                  03390480022
+                  {activeHelpline}
                 </a>
               </div>
 
@@ -1151,7 +1164,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/40 text-amber-300 text-xs font-black shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Licensed PTA CVAS District Coverage · District Sargodha, Pakistan Only</span>
+                <span>Licensed PTA CVAS ({activeLicense}) · {activeCoverageHeadline}</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
@@ -1189,7 +1202,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                 </button>
               </div>
 
-              {/* Interactive Direct Support Bar (Helpline 03390480022 & support.citrus@gmail.com) */}
+              {/* Interactive Direct Support Bar */}
               <div className="pt-3 grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-2xl">
                 <div className="p-4 rounded-2xl bg-slate-900/80 border border-amber-500/30 hover:border-amber-400 transition-all flex items-center justify-between gap-3 group">
                   <div className="flex items-center gap-3">
@@ -1201,16 +1214,16 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                         24/7 NOC Helpline & Support
                       </div>
                       <a
-                        href="tel:03390480022"
+                        href={`tel:${activeHelpline}`}
                         className="font-mono font-black text-base text-white hover:text-amber-300 transition-colors"
                       >
-                        03390480022
+                        {activeHelpline}
                       </a>
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleCopyText('03390480022', 'phone')}
+                    onClick={() => handleCopyText(activeHelpline, 'phone')}
                     title="Copy Helpline Number"
                     className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-bold text-slate-200 flex items-center gap-1 cursor-pointer border border-slate-700"
                   >
@@ -1238,16 +1251,16 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                         Official Support Email
                       </div>
                       <a
-                        href="mailto:support.citrus@gmail.com"
+                        href={`mailto:${activeEmail}`}
                         className="font-mono font-bold text-xs sm:text-sm text-white hover:text-emerald-300 truncate block transition-colors"
                       >
-                        support.citrus@gmail.com
+                        {activeEmail}
                       </a>
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleCopyText('support.citrus@gmail.com', 'email')}
+                    onClick={() => handleCopyText(activeEmail, 'email')}
                     title="Copy Support Email"
                     className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-bold text-slate-200 flex items-center gap-1 cursor-pointer border border-slate-700 shrink-0"
                   >
@@ -1364,18 +1377,18 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-black uppercase tracking-wider">
                 <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
-                <span>Coverage Network</span>
+                <span>Coverage Network · License: {activeLicense}</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-black text-slate-950 tracking-tight">
                 Licensed PTA CVAS District Coverage
               </h2>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-600 text-white font-black text-base sm:text-lg shadow-md">
                 <MapPin className="w-5 h-5 text-yellow-200 shrink-0" />
-                <span>District Sargodha, Pakistan only</span>
+                <span>{activeCoverageHeadline}</span>
               </div>
               <p className="text-sm text-slate-600 max-w-2xl pt-1">
-                Citrus Pvt Ltd operates dedicated 10G GPON Optical Fiber rings exclusively across{' '}
-                <strong className="text-slate-900">District Sargodha, Pakistan</strong>. Click any Sargodha sector below to inspect live OLT node health or register a complaint.
+                Citrus Pvt Ltd operates dedicated 10G GPON Optical Fiber rings across{' '}
+                <strong className="text-slate-900">{activeCoverageHeadline}</strong>. Click any Sargodha sector below to inspect live OLT node health or register a complaint.
               </p>
             </div>
 
@@ -1407,7 +1420,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   <button
                     key={zone.id}
                     type="button"
-                    onClick={() => setSelectedZone(zone)}
+                    onClick={() => setSelectedZoneId(zone.id)}
                     className={`text-left p-5 rounded-3xl transition-all cursor-pointer border-2 relative overflow-hidden group ${
                       isActive
                         ? 'bg-white border-orange-500 shadow-xl ring-4 ring-orange-500/15 -translate-y-0.5'
@@ -1454,7 +1467,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               <div className="space-y-3 text-xs">
                 <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
                   <span className="text-slate-400">Licensed Jurisdiction:</span>
-                  <span className="font-black text-amber-300">District Sargodha, Pakistan only</span>
+                  <span className="font-black text-amber-300">{activeCoverageHeadline}</span>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
@@ -1557,7 +1570,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               </p>
               <div className="mt-4 text-[11px] font-extrabold text-orange-800 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-orange-600" />
-                <span>24/7 Helpline: 03390480022</span>
+                <span>24/7 Helpline: {activeHelpline}</span>
               </div>
             </div>
 
@@ -1676,11 +1689,11 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             {[
               {
                 q: 'What is the Coverage Area of Citrus Pvt Ltd?',
-                a: 'Citrus Pvt Ltd is licensed under PTA CVAS for District Sargodha, Pakistan only. We cover Satellite Town, University Road, Model Town, Civil Lines, Cantt, Queens Road, and surrounding Sargodha sectors.',
+                a: `Citrus Pvt Ltd is licensed under PTA CVAS (${activeLicense}) for ${activeCoverageHeadline}.`,
               },
               {
                 q: 'How can I contact the 24/7 NOC Helpline & Support?',
-                a: 'You can call or WhatsApp our 24/7 NOC Helpline & support number at 03390480022 or email us anytime at support.citrus@gmail.com.',
+                a: `You can call or WhatsApp our 24/7 NOC Helpline & support number at ${activeHelpline} or email us anytime at ${activeEmail}.`,
               },
               {
                 q: 'Is my complaint history private when I sign in with Gmail?',
@@ -1717,7 +1730,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
         </div>
       </section>
 
-      {/* 7. FOOTER WITH UPDATED SARGODHA COVERAGE, 03390480022 HELPLINE, AND SUPPORT.CITRUS@GMAIL.COM */}
+      {/* 7. FOOTER WITH UPDATED SARGODHA COVERAGE, HELPLINE, AND SUPPORT EMAIL */}
       <footer className="bg-slate-950 text-slate-400 text-xs pt-12 pb-8 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-800">
@@ -1730,11 +1743,11 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                 <span>Citrus Pvt Ltd</span>
               </div>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Licensed PTA CVAS District Coverage: <strong className="text-amber-300">District Sargodha, Pakistan only</strong>. Providing high-speed optical fiber FTTH internet and enterprise broadband infrastructure.
+                Licensed PTA CVAS District Coverage (<strong className="font-mono text-white">{activeLicense}</strong>): <strong className="text-amber-300">{activeCoverageHeadline}</strong>. Providing high-speed optical fiber FTTH internet and enterprise broadband infrastructure.
               </p>
             </div>
 
-            {/* Col 2: Customer Support (Updated Helpline & Email, PTA Escalation Removed) */}
+            {/* Col 2: Customer Support */}
             <div className="space-y-2.5">
               <span className="text-xs font-extrabold text-white uppercase tracking-wider block">
                 24/7 NOC Helpline & Customer Support
@@ -1744,26 +1757,26 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   <PhoneCall className="w-4 h-4 text-amber-400 shrink-0" />
                   <span>24/7 NOC Helpline & Support:</span>
                   <a
-                    href="tel:03390480022"
+                    href={`tel:${activeHelpline}`}
                     className="text-amber-300 font-mono font-black text-sm hover:underline"
                   >
-                    03390480022
+                    {activeHelpline}
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>Support Email:</span>
                   <a
-                    href="mailto:support.citrus@gmail.com"
+                    href={`mailto:${activeEmail}`}
                     className="text-emerald-300 font-mono font-bold hover:underline"
                   >
-                    support.citrus@gmail.com
+                    {activeEmail}
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-orange-400 shrink-0" />
                   <span>Coverage Network:</span>
-                  <span className="text-slate-200 font-bold">District Sargodha, Pakistan only</span>
+                  <span className="text-slate-200 font-bold">{activeCoverageHeadline}</span>
                 </div>
               </div>
             </div>
@@ -1790,10 +1803,10 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-[11px]">
             <div>
-              © 2026 Citrus Pvt Ltd. All rights reserved. Regulated by Pakistan Telecommunication Authority (PTA).
+              © 2026 Citrus Pvt Ltd. All rights reserved. Regulated by Pakistan Telecommunication Authority (PTA) · License #{activeLicense}.
             </div>
             <div className="text-amber-400/90 font-bold">
-              Licensed PTA CVAS District Coverage: District Sargodha, Pakistan only
+              Licensed PTA CVAS District Coverage: {activeCoverageHeadline}
             </div>
           </div>
         </div>
@@ -1815,11 +1828,11 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black uppercase mb-2">
               <MapPin className="w-3 h-3 text-orange-600" />
-              <span>District Sargodha, Pakistan Only</span>
+              <span>{activeCoverageHeadline}</span>
             </div>
             <h3 className="text-xl font-black text-slate-950 mb-1">Express Complaint Registration</h3>
             <p className="text-xs text-slate-500 mb-5">
-              Quickly log a fiber fault in District Sargodha · 24/7 Helpline: 03390480022
+              Quickly log a fiber fault in District Sargodha · 24/7 Helpline: {activeHelpline}
             </p>
 
             {quickLodgeSuccessTicket ? (
@@ -1832,7 +1845,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   Ticket #: {quickLodgeSuccessTicket.ticketNumber}
                 </div>
                 <p className="text-xs text-slate-600">
-                  Citrus Sargodha NOC team has received your complaint. For urgent support call <strong>03390480022</strong>.
+                  Citrus Sargodha NOC team has received your complaint. For urgent support call <strong>{activeHelpline}</strong>.
                 </p>
                 <button
                   onClick={() => {

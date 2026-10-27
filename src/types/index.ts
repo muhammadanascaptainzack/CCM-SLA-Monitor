@@ -113,16 +113,30 @@ export interface ComplaintTicket {
   timeline: TicketTimelineEntry[];
 }
 
+export interface SargodhaCoverageZone {
+  id: string;
+  name: string;
+  blocks: string;
+  oltNode: string;
+  status: 'Active GPON Fiber' | 'High-Speed FTTH';
+  opticalSignal: string;
+  pingMs: string;
+  color: string;
+  badgeBg: string;
+}
+
 export interface PTALicenseeConfig {
   licenseeName: string;
-  licenseNumber: string; // e.g. CVAS-DATA/DIST-FSD/2024-819
+  licenseNumber: string; // e.g. Class/Internet/11/2026/Sargodha
   licenseType: string; // District CVAS (Data & Class Value Added Services)
   registeredDistrict: DistrictName;
-  regionalPtaOffice: string; // PTA Zonal Office, Lahore/Rawalpindi
+  regionalPtaOffice: string; // PTA Zonal Office, Sargodha / Lahore Region
   complianceOfficerName: string;
   complianceOfficerEmail: string;
   complianceOfficerPhone: string;
   emergencyNocHelpline: string;
+  coverageHeadline?: string;
+  coverageZones?: SargodhaCoverageZone[];
 }
 
 export interface PTAMonthlyReport {

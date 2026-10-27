@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   UserPlus, 
@@ -10,24 +10,90 @@ import {
   Trash2, 
   Edit3, 
   Users, 
-  Lock, 
   Server, 
   CheckCircle2, 
-  AlertCircle,
   Phone,
   Mail,
   MapPin,
-  ExternalLink,
   LogIn,
   Terminal,
   Radio,
-  FileCheck,
   Building,
-  RefreshCw,
-  Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  Plus,
+  Wifi,
+  RotateCcw
 } from 'lucide-react';
-import { User, UserRole, DistrictName, PTALicenseeConfig } from '../types/index.js';
+import { User, UserRole, DistrictName, PTALicenseeConfig, SargodhaCoverageZone } from '../types/index.js';
+
+const DEFAULT_ZONES_FALLBACK: SargodhaCoverageZone[] = [
+  {
+    id: 'satellite-town',
+    name: 'Satellite Town (Blocks A, B, C, D & X, Y, Z)',
+    blocks: 'Main Commercial Market, Block A–Z Residential Sectors',
+    oltNode: 'SGD-OLT-01 (Huawei MA5800 X7)',
+    status: 'Active GPON Fiber',
+    opticalSignal: '-18.4 dBm (Optimal)',
+    pingMs: '4 ms',
+    color: 'from-emerald-500 to-teal-600',
+    badgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+  },
+  {
+    id: 'university-road',
+    name: 'University Road & UOS Campus Corridor',
+    blocks: 'University of Sargodha, Khayaban-e-Sadiq, New Satellite Town',
+    oltNode: 'SGD-OLT-02 (Core Ring North)',
+    status: 'High-Speed FTTH',
+    opticalSignal: '-19.1 dBm (Optimal)',
+    pingMs: '5 ms',
+    color: 'from-orange-500 to-amber-500',
+    badgeBg: 'bg-orange-100 text-orange-900 border-orange-300',
+  },
+  {
+    id: 'model-town',
+    name: 'Model Town, Civil Lines & Club Road',
+    blocks: 'Civil Lines, District Courts, Club Road, Officer Colony',
+    oltNode: 'SGD-OLT-03 (Metro Core)',
+    status: 'Active GPON Fiber',
+    opticalSignal: '-18.8 dBm (Optimal)',
+    pingMs: '4 ms',
+    color: 'from-sky-500 to-indigo-600',
+    badgeBg: 'bg-sky-100 text-sky-900 border-sky-300',
+  },
+  {
+    id: 'queens-cantt',
+    name: 'Queens Road, Cantt & PAF Road Commercial',
+    blocks: 'Cantt Plaza, Queens Road, Katchery Bazaar, Trust Plaza',
+    oltNode: 'SGD-OLT-04 (Enterprise CIR Node)',
+    status: 'High-Speed FTTH',
+    opticalSignal: '-17.9 dBm (Optimal)',
+    pingMs: '3 ms',
+    color: 'from-purple-600 to-fuchsia-600',
+    badgeBg: 'bg-purple-100 text-purple-900 border-purple-300',
+  },
+  {
+    id: 'faisalabad-lahore-rd',
+    name: 'Faisalabad Road, Lahore Road & Industrial Zone',
+    blocks: 'Chak 47 NB, Silanwali Road, Citrus Processing Zone, 49 Tail',
+    oltNode: 'SGD-OLT-05 (Industrial Feeder)',
+    status: 'Active GPON Fiber',
+    opticalSignal: '-19.6 dBm (Optimal)',
+    pingMs: '6 ms',
+    color: 'from-rose-500 to-orange-500',
+    badgeBg: 'bg-rose-100 text-rose-900 border-rose-300',
+  },
+  {
+    id: 'khushab-bhalwal',
+    name: 'Khushab Road, Bhalwal & Kot Momin Link',
+    blocks: 'Fatima Jinnah Road, Eidgah Road, Ispahani Town, Bhalwal Feeder',
+    oltNode: 'SGD-OLT-06 (District Ring West)',
+    status: 'High-Speed FTTH',
+    opticalSignal: '-19.3 dBm (Optimal)',
+    pingMs: '5 ms',
+    color: 'from-teal-500 to-cyan-600',
+    badgeBg: 'bg-teal-100 text-teal-900 border-teal-300',
+  },
+];
 
 interface AdminConsoleViewProps {
   users: User[];
@@ -50,7 +116,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   onSwitchToUser,
   onBackToDashboard,
 }) => {
-  const [activeTab, setActiveTab] = useState<'team' | 'ports' | 'license'>('team');
+  const [activeTab, setActiveTab] = useState<'team' | 'coverage' | 'license' | 'ports'>('team');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({});
@@ -67,11 +133,39 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   const [formDistrict, setFormDistrict] = useState<DistrictName>('Sargodha');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // License config form
+  // License & Helpline config form state
   const [helpline, setHelpline] = useState(config?.emergencyNocHelpline || '03390480022');
-  const [licenseNumber, setLicenseNumber] = useState(config?.licenseNumber || 'CVAS-DATA/DIST-SGD/CITRUS-2024');
+  const [licenseNumber, setLicenseNumber] = useState(config?.licenseNumber || 'Class/Internet/11/2026/Sargodha');
+  const [supportEmail, setSupportEmail] = useState(config?.complianceOfficerEmail || 'support.citrus@gmail.com');
+  const [coverageHeadline, setCoverageHeadline] = useState(config?.coverageHeadline || 'District Sargodha, Pakistan only');
+  const [coverageZones, setCoverageZones] = useState<SargodhaCoverageZone[]>(
+    config?.coverageZones && config.coverageZones.length > 0 ? config.coverageZones : DEFAULT_ZONES_FALLBACK
+  );
   const [isSavingConfig, setIsSavingConfig] = useState(false);
   const [configSavedToast, setConfigSavedToast] = useState(false);
+
+  // Coverage Zone Modal state
+  const [showZoneModal, setShowZoneModal] = useState(false);
+  const [editingZone, setEditingZone] = useState<SargodhaCoverageZone | null>(null);
+  const [zoneName, setZoneName] = useState('');
+  const [zoneBlocks, setZoneBlocks] = useState('');
+  const [zoneOltNode, setZoneOltNode] = useState('SGD-OLT-07 (Sargodha GPON)');
+  const [zoneStatus, setZoneStatus] = useState<'Active GPON Fiber' | 'High-Speed FTTH'>('Active GPON Fiber');
+  const [zoneSignal, setZoneSignal] = useState('-18.5 dBm (Optimal)');
+  const [zonePing, setZonePing] = useState('4 ms');
+
+  // Sync local state whenever config prop updates
+  useEffect(() => {
+    if (config) {
+      setHelpline(config.emergencyNocHelpline || '03390480022');
+      setLicenseNumber(config.licenseNumber || 'Class/Internet/11/2026/Sargodha');
+      setSupportEmail(config.complianceOfficerEmail || 'support.citrus@gmail.com');
+      setCoverageHeadline(config.coverageHeadline || 'District Sargodha, Pakistan only');
+      if (config.coverageZones && config.coverageZones.length > 0) {
+        setCoverageZones(config.coverageZones);
+      }
+    }
+  }, [config]);
 
   const staffMembers = users.filter((u) => u.role !== 'customer');
   const customerCount = users.filter((u) => u.role === 'customer').length;
@@ -145,18 +239,15 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
       setShowAddModal(false);
       setIsSubmitting(false);
     } catch (err: any) {
-      alert(err.message || 'Failed to save staff account');
       setIsSubmitting(false);
     }
   };
 
   const handleDeleteStaff = async (user: User) => {
-    if (confirm(`Are you sure you want to delete access for ${user.name}?`)) {
-      try {
-        await onDeleteUser(user.id);
-      } catch (err: any) {
-        alert(err.message || 'Failed to delete user');
-      }
+    try {
+      await onDeleteUser(user.id);
+    } catch (err: any) {
+      console.error(err);
     }
   };
 
@@ -164,16 +255,132 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
     e.preventDefault();
     setIsSavingConfig(true);
     try {
+      const cleanHelpline = helpline.trim() || '03390480022';
+      const cleanLicense = licenseNumber.trim() || 'Class/Internet/11/2026/Sargodha';
+      const cleanEmail = supportEmail.trim() || 'support.citrus@gmail.com';
+      const cleanHeadline = coverageHeadline.trim() || 'District Sargodha, Pakistan only';
+
       await onUpdateConfig({
-        emergencyNocHelpline: helpline,
-        licenseNumber: licenseNumber,
+        emergencyNocHelpline: cleanHelpline,
+        complianceOfficerPhone: cleanHelpline,
+        licenseNumber: cleanLicense,
+        complianceOfficerEmail: cleanEmail,
+        coverageHeadline: cleanHeadline,
+        coverageZones,
       });
       setIsSavingConfig(false);
       setConfigSavedToast(true);
+      setTimeout(() => setConfigSavedToast(false), 3500);
+    } catch (err) {
+      setIsSavingConfig(false);
+    }
+  };
+
+  // Coverage Zone Handlers
+  const openAddZoneModal = () => {
+    setEditingZone(null);
+    setZoneName('');
+    setZoneBlocks('');
+    setZoneOltNode(`SGD-OLT-0${coverageZones.length + 1} (Sargodha GPON)`);
+    setZoneStatus('Active GPON Fiber');
+    setZoneSignal('-18.5 dBm (Optimal)');
+    setZonePing('4 ms');
+    setShowZoneModal(true);
+  };
+
+  const openEditZoneModal = (zone: SargodhaCoverageZone) => {
+    setEditingZone(zone);
+    setZoneName(zone.name);
+    setZoneBlocks(zone.blocks);
+    setZoneOltNode(zone.oltNode);
+    setZoneStatus(zone.status);
+    setZoneSignal(zone.opticalSignal);
+    setZonePing(zone.pingMs);
+    setShowZoneModal(true);
+  };
+
+  const handleSaveZone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const colorPairs = [
+      { color: 'from-emerald-500 to-teal-600', badgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
+      { color: 'from-orange-500 to-amber-500', badgeBg: 'bg-orange-100 text-orange-900 border-orange-300' },
+      { color: 'from-sky-500 to-indigo-600', badgeBg: 'bg-sky-100 text-sky-900 border-sky-300' },
+      { color: 'from-purple-600 to-fuchsia-600', badgeBg: 'bg-purple-100 text-purple-900 border-purple-300' },
+      { color: 'from-rose-500 to-orange-500', badgeBg: 'bg-rose-100 text-rose-900 border-rose-300' },
+      { color: 'from-teal-500 to-cyan-600', badgeBg: 'bg-teal-100 text-teal-900 border-teal-300' },
+    ];
+    const theme = colorPairs[coverageZones.length % colorPairs.length];
+
+    let updatedZones: SargodhaCoverageZone[];
+    if (editingZone) {
+      updatedZones = coverageZones.map((z) =>
+        z.id === editingZone.id
+          ? {
+              ...z,
+              name: zoneName.trim(),
+              blocks: zoneBlocks.trim(),
+              oltNode: zoneOltNode.trim(),
+              status: zoneStatus,
+              opticalSignal: zoneSignal.trim(),
+              pingMs: zonePing.trim(),
+            }
+          : z
+      );
+    } else {
+      const newZone: SargodhaCoverageZone = {
+        id: `sgd-zone-${Date.now()}`,
+        name: zoneName.trim(),
+        blocks: zoneBlocks.trim(),
+        oltNode: zoneOltNode.trim(),
+        status: zoneStatus,
+        opticalSignal: zoneSignal.trim(),
+        pingMs: zonePing.trim(),
+        color: theme.color,
+        badgeBg: theme.badgeBg,
+      };
+      updatedZones = [...coverageZones, newZone];
+    }
+
+    setCoverageZones(updatedZones);
+    setShowZoneModal(false);
+    setIsSavingConfig(true);
+    try {
+      await onUpdateConfig({
+        coverageZones: updatedZones,
+        coverageHeadline: coverageHeadline.trim() || 'District Sargodha, Pakistan only',
+      });
+      setIsSavingConfig(false);
+      setConfigSavedToast(true);
+      setTimeout(() => setConfigSavedToast(false), 3500);
+    } catch {
+      setIsSavingConfig(false);
+    }
+  };
+
+  const handleDeleteZone = async (zoneId: string) => {
+    const updatedZones = coverageZones.filter((z) => z.id !== zoneId);
+    setCoverageZones(updatedZones);
+    try {
+      await onUpdateConfig({ coverageZones: updatedZones });
+      setConfigSavedToast(true);
       setTimeout(() => setConfigSavedToast(false), 3000);
     } catch (err) {
-      alert('Failed to update config');
-      setIsSavingConfig(false);
+      console.error(err);
+    }
+  };
+
+  const handleResetZones = async () => {
+    setCoverageZones(DEFAULT_ZONES_FALLBACK);
+    setCoverageHeadline('District Sargodha, Pakistan only');
+    try {
+      await onUpdateConfig({
+        coverageZones: DEFAULT_ZONES_FALLBACK,
+        coverageHeadline: 'District Sargodha, Pakistan only',
+      });
+      setConfigSavedToast(true);
+      setTimeout(() => setConfigSavedToast(false), 3000);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -222,6 +429,10 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
     }
   };
 
+  const activeLicenseDisplay = config?.licenseNumber || licenseNumber || 'Class/Internet/11/2026/Sargodha';
+  const activeHelplineDisplay = config?.emergencyNocHelpline || helpline || '03390480022';
+  const activeCoverageHeadlineDisplay = config?.coverageHeadline || coverageHeadline || 'District Sargodha, Pakistan only';
+
   return (
     <div className="space-y-6">
       
@@ -234,20 +445,19 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                 <ShieldCheck className="w-4 h-4 text-purple-300" />
                 <span>Citrus Administrator Command Console</span>
               </span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono font-bold border border-emerald-500/40">
-                Port 4000 Active
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold border border-amber-400/40">
+                License: {activeLicenseDisplay}
               </span>
-              <span className="text-xs text-purple-300 font-mono">
-                Port 3000 Preview Supported
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono font-bold border border-emerald-500/40">
+                24/7 Helpline: {activeHelplineDisplay}
               </span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Create Team Logins, Set Passwords & Access Control
+              Team Logins, Sargodha Coverage & PTA License Settings
             </h1>
             <p className="text-xs sm:text-sm text-purple-200/90 max-w-2xl leading-relaxed">
-              Manage login access for your NOC Supervisors, Field Linemen / Splicers, and PTA Compliance staff. 
-              Team members can instantly log in with their created email and password.
+              Manage NOC staff logins, edit Sargodha optical fiber coverage sectors, and update your official PTA License Number and 24/7 NOC Helpline.
             </p>
           </div>
 
@@ -272,36 +482,58 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
           </div>
         </div>
 
-        {/* Quick KPI Counters */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-purple-800/60">
+        {/* Quick KPI Status Bar */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-6 border-t border-purple-800/60">
           <div className="bg-purple-950/60 backdrop-blur-sm p-4 rounded-2xl border border-purple-700/50">
             <div className="text-xs font-bold text-purple-300">Active Staff Logins</div>
             <div className="text-2xl font-black text-white mt-1 font-mono">{staffMembers.length}</div>
-            <div className="text-[11px] text-purple-300">NOC & Field Linemen</div>
+            <div className="text-[11px] text-purple-300">{customerCount} Registered Subscribers</div>
           </div>
 
-          <div className="bg-purple-950/60 backdrop-blur-sm p-4 rounded-2xl border border-purple-700/50">
-            <div className="text-xs font-bold text-emerald-300">Web Server Port</div>
-            <div className="text-2xl font-black text-emerald-300 mt-1 font-mono">4000</div>
-            <div className="text-[11px] text-emerald-200">User Requested Active</div>
+          <div
+            onClick={() => setActiveTab('coverage')}
+            className="bg-purple-950/60 hover:bg-purple-900/70 backdrop-blur-sm p-4 rounded-2xl border border-emerald-500/40 cursor-pointer transition-colors"
+          >
+            <div className="text-xs font-bold text-emerald-300 flex items-center justify-between">
+              <span>Sargodha Coverage</span>
+              <span className="text-[10px] underline">Edit Sectors</span>
+            </div>
+            <div className="text-base font-black text-white mt-1 truncate">
+              {activeCoverageHeadlineDisplay}
+            </div>
+            <div className="text-[11px] text-emerald-200">{coverageZones.length} Active Fiber OLT Sectors</div>
           </div>
 
-          <div className="bg-purple-950/60 backdrop-blur-sm p-4 rounded-2xl border border-purple-700/50">
-            <div className="text-xs font-bold text-purple-300">Registered Subscribers</div>
-            <div className="text-2xl font-black text-white mt-1 font-mono">{customerCount}</div>
-            <div className="text-[11px] text-purple-300">District Sargodha, Pakistan</div>
+          <div
+            onClick={() => setActiveTab('license')}
+            className="bg-purple-950/60 hover:bg-purple-900/70 backdrop-blur-sm p-4 rounded-2xl border border-sky-500/40 cursor-pointer transition-colors"
+          >
+            <div className="text-xs font-bold text-sky-300 flex items-center justify-between">
+              <span>24/7 NOC Helpline</span>
+              <span className="text-[10px] underline">Edit</span>
+            </div>
+            <div className="text-xl font-black text-white mt-1 font-mono">{activeHelplineDisplay}</div>
+            <div className="text-[11px] text-sky-200">{config?.complianceOfficerEmail || supportEmail}</div>
           </div>
 
-          <div className="bg-purple-950/60 backdrop-blur-sm p-4 rounded-2xl border border-purple-700/50">
-            <div className="text-xs font-bold text-amber-300">PTA License</div>
-            <div className="text-base font-black text-amber-300 mt-1 truncate font-mono">CITRUS-2024</div>
+          <div
+            onClick={() => setActiveTab('license')}
+            className="bg-purple-950/60 hover:bg-purple-900/70 backdrop-blur-sm p-4 rounded-2xl border border-amber-500/40 cursor-pointer transition-colors"
+          >
+            <div className="text-xs font-bold text-amber-300 flex items-center justify-between">
+              <span>Official PTA License</span>
+              <span className="text-[10px] underline">Edit</span>
+            </div>
+            <div className="text-sm sm:text-base font-black text-amber-300 mt-1 break-all font-mono">
+              {activeLicenseDisplay}
+            </div>
             <div className="text-[11px] text-amber-200">District CVAS Standard</div>
           </div>
         </div>
       </div>
 
-      {/* 2. TAB SWITCHER (TEAM LOGINS / PORT 4000 INFO / PTA LICENSE) */}
-      <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 text-xs font-extrabold max-w-fit">
+      {/* 2. TAB SWITCHER (TEAM LOGINS / SARGODHA COVERAGE / PTA LICENSE & HELPLINE / PORT 4000) */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 text-xs font-extrabold max-w-fit">
         <button
           type="button"
           onClick={() => setActiveTab('team')}
@@ -317,15 +549,15 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
         <button
           type="button"
-          onClick={() => setActiveTab('ports')}
+          onClick={() => setActiveTab('coverage')}
           className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'ports'
-              ? 'bg-emerald-600 text-white shadow-md'
+            activeTab === 'coverage'
+              ? 'bg-amber-500 text-slate-950 shadow-md font-black'
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Server className="w-4 h-4" />
-          <span>Port 4000 & Linux Host</span>
+          <MapPin className="w-4 h-4" />
+          <span>Sargodha Coverage Network ({coverageZones.length})</span>
         </button>
 
         <button
@@ -338,9 +570,33 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
           }`}
         >
           <Building className="w-4 h-4" />
-          <span>PTA License & Helpline</span>
+          <span>PTA License & 24/7 Helpline</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('ports')}
+          className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
+            activeTab === 'ports'
+              ? 'bg-emerald-600 text-white shadow-md'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Server className="w-4 h-4" />
+          <span>Port 4000 & Linux Host</span>
         </button>
       </div>
+
+      {configSavedToast && (
+        <div className="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl text-emerald-900 text-xs font-extrabold flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>
+              Settings saved and applied across the website! Official License: <strong className="font-mono">{activeLicenseDisplay}</strong> · 24/7 Helpline: <strong className="font-mono">{activeHelplineDisplay}</strong>
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* 3. TAB 1: TEAM MEMBERS CARDS GRID */}
       {activeTab === 'team' && (
@@ -502,7 +758,237 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
         </div>
       )}
 
-      {/* 4. TAB 2: PORT 4000 & LINUX HOST CONFIGURATION */}
+      {/* 4. TAB 2: SARGODHA COVERAGE NETWORK EDITOR */}
+      {activeTab === 'coverage' && (
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center font-black">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-slate-900">
+                  Sargodha Coverage Network & OLT Sectors Manager
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Add, edit, or remove Sargodha fiber coverage sectors displayed on the public portal
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleResetZones}
+                className="px-3.5 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl flex items-center gap-1.5 cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset Defaults</span>
+              </button>
+              <button
+                type="button"
+                onClick={openAddZoneModal}
+                className="px-4 py-2.5 text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ Add Sargodha Sector</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Coverage Headline Form */}
+          <form onSubmit={handleSaveConfig} className="p-4 bg-amber-50/60 border border-amber-200 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-end gap-3 text-xs">
+            <div className="flex-1">
+              <label className="block text-slate-800 font-black mb-1">
+                Licensed Coverage Jurisdiction Headline (Displayed on Portal Banner & Coverage Section)
+              </label>
+              <input
+                type="text"
+                value={coverageHeadline}
+                onChange={(e) => setCoverageHeadline(e.target.value)}
+                placeholder="District Sargodha, Pakistan only"
+                className="w-full px-3.5 py-2.5 bg-white border border-amber-300 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isSavingConfig}
+              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-xl shadow-sm cursor-pointer whitespace-nowrap"
+            >
+              {isSavingConfig ? 'Saving...' : 'Save Coverage Headline'}
+            </button>
+          </form>
+
+          {/* Editable Sectors Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {coverageZones.map((zone) => (
+              <div
+                key={zone.id}
+                className="p-5 rounded-2xl border-2 border-slate-200 hover:border-amber-400 bg-white shadow-xs space-y-3 relative overflow-hidden transition-all"
+              >
+                <div className={`h-1.5 w-full absolute top-0 left-0 bg-gradient-to-r ${zone.color}`} />
+                <div className="flex items-start justify-between gap-2 pt-1">
+                  <div>
+                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black border ${zone.badgeBg}`}>
+                      {zone.status}
+                    </span>
+                    <h3 className="text-sm font-black text-slate-900 mt-1.5">{zone.name}</h3>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => openEditZoneModal(zone)}
+                      className="px-2.5 py-1.5 text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg flex items-center gap-1 cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+                    {coverageZones.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteZone(zone.id)}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer"
+                        title="Remove Sector"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-600">{zone.blocks}</p>
+
+                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-[11px]">
+                  <div className="bg-slate-50 p-2 rounded-lg">
+                    <span className="text-slate-400 block text-[10px]">OLT Node</span>
+                    <span className="font-mono font-bold text-slate-800 truncate block">{zone.oltNode}</span>
+                  </div>
+                  <div className="bg-emerald-50 p-2 rounded-lg">
+                    <span className="text-emerald-700 block text-[10px]">Optical Rx</span>
+                    <span className="font-mono font-bold text-emerald-950 truncate block">{zone.opticalSignal}</span>
+                  </div>
+                  <div className="bg-amber-50 p-2 rounded-lg">
+                    <span className="text-amber-800 block text-[10px]">Ping Latency</span>
+                    <span className="font-mono font-bold text-amber-950 truncate block">{zone.pingMs}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 5. TAB 3: PTA LICENSE & 24/7 HELPLINE SETTINGS */}
+      {activeTab === 'license' && (
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center font-black">
+              <Building className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-slate-900">
+                PTA District CVAS License & 24/7 Helpline Settings
+              </h2>
+              <p className="text-xs text-slate-500">
+                Updates immediately reflect on the Admin Status Bar, NOC Dashboard, Customer Portal, and PTA Compliance Reports
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSaveConfig} className="space-y-4 text-xs max-w-xl">
+            <div>
+              <label className="block text-slate-700 font-bold mb-1">Company / Licensee Name</label>
+              <input
+                type="text"
+                readOnly
+                value="Citrus Pvt Ltd"
+                className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-900 font-bold cursor-default"
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-700 font-bold mb-1">
+                Official License Number *
+              </label>
+              <input
+                type="text"
+                required
+                value={licenseNumber}
+                onChange={(e) => setLicenseNumber(e.target.value)}
+                placeholder="Class/Internet/11/2026/Sargodha"
+                className="w-full px-3.5 py-2.5 bg-white border-2 border-purple-200 rounded-xl text-slate-900 font-mono font-bold focus:ring-2 focus:ring-purple-600 focus:outline-none"
+              />
+              <span className="text-[11px] text-slate-500 mt-1 block">
+                Official format: <code className="font-mono font-bold text-purple-800">Class/Internet/11/2026/Sargodha</code>
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-slate-700 font-bold mb-1">
+                24/7 NOC Helpline & Support Number *
+              </label>
+              <input
+                type="text"
+                required
+                value={helpline}
+                onChange={(e) => setHelpline(e.target.value)}
+                placeholder="03390480022"
+                className="w-full px-3.5 py-2.5 bg-white border-2 border-emerald-200 rounded-xl text-slate-900 font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+              />
+              <span className="text-[11px] text-slate-500 mt-1 block">
+                Updates all clickable <code className="font-mono">tel:</code> links and helpline banners across the entire portal.
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-slate-700 font-bold mb-1">
+                Official Support Email *
+              </label>
+              <input
+                type="email"
+                required
+                value={supportEmail}
+                onChange={(e) => setSupportEmail(e.target.value)}
+                placeholder="support.citrus@gmail.com"
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-mono font-medium focus:ring-1 focus:ring-purple-600 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-700 font-bold mb-1">
+                Licensed Coverage Area Title *
+              </label>
+              <input
+                type="text"
+                required
+                value={coverageHeadline}
+                onChange={(e) => setCoverageHeadline(e.target.value)}
+                placeholder="District Sargodha, Pakistan only"
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold focus:ring-1 focus:ring-purple-600 focus:outline-none"
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-3">
+              {configSavedToast ? (
+                <span className="text-emerald-700 font-bold flex items-center gap-1 text-xs">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Settings updated on Admin Panel & Portal!</span>
+                </span>
+              ) : <div />}
+
+              <button
+                type="submit"
+                disabled={isSavingConfig}
+                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl shadow-md cursor-pointer"
+              >
+                {isSavingConfig ? 'Saving...' : 'Save Settings'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* 6. TAB 4: PORT 4000 & LINUX HOST CONFIGURATION */}
       {activeTab === 'ports' && (
         <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
           <div className="flex items-center gap-3">
@@ -582,7 +1068,7 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/var/www/citrus-cms
+WorkingDirectory=/opt/citrus-cms
 Environment=NODE_ENV=production
 Environment=PORT=4000
 ExecStart=/usr/bin/npm start
@@ -595,75 +1081,127 @@ WantedBy=multi-user.target`}
         </div>
       )}
 
-      {/* 5. TAB 3: PTA LICENSE & COMPANY SETTINGS */}
-      {activeTab === 'license' && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center font-black">
-              <Building className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-lg font-black text-slate-900">
-                PTA District CVAS License & Company Settings
-              </h2>
-              <p className="text-xs text-slate-500">
-                Official regulatory details used across automated compliance filings
-              </p>
-            </div>
-          </div>
-
-          <form onSubmit={handleSaveConfig} className="space-y-4 text-xs max-w-xl">
-            <div>
-              <label className="block text-slate-700 font-bold mb-1">Company / Licensee Name</label>
-              <input
-                type="text"
-                readOnly
-                value="Citrus Pvt Ltd"
-                className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-900 font-bold cursor-default"
-              />
-            </div>
-
-            <div>
-              <label className="block text-slate-700 font-bold mb-1">Official License Number</label>
-              <input
-                type="text"
-                value={licenseNumber}
-                onChange={(e) => setLicenseNumber(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-mono font-medium focus:ring-1 focus:ring-purple-600 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-slate-700 font-bold mb-1">24/7 NOC Helpline Number</label>
-              <input
-                type="text"
-                value={helpline}
-                onChange={(e) => setHelpline(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-mono font-medium focus:ring-1 focus:ring-purple-600 focus:outline-none"
-              />
-            </div>
-
-            <div className="flex items-center justify-between pt-2">
-              {configSavedToast ? (
-                <span className="text-emerald-700 font-bold flex items-center gap-1 text-xs">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Settings updated successfully!</span>
-                </span>
-              ) : <div />}
-
+      {/* 7. ADD / EDIT SARGODHA COVERAGE SECTOR MODAL */}
+      {showZoneModal && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 sm:p-7 space-y-4 text-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                  <Wifi className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">
+                    {editingZone ? 'Edit Sargodha Coverage Sector' : 'Add Sargodha Coverage Sector'}
+                  </h3>
+                  <p className="text-slate-500 text-[11px]">Configure OLT node and covered streets/blocks in District Sargodha</p>
+                </div>
+              </div>
               <button
-                type="submit"
-                disabled={isSavingConfig}
-                className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl shadow-md cursor-pointer"
+                type="button"
+                onClick={() => setShowZoneModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 cursor-pointer"
               >
-                {isSavingConfig ? 'Saving...' : 'Save Settings'}
+                ✕
               </button>
             </div>
-          </form>
+
+            <form onSubmit={handleSaveZone} className="space-y-3.5">
+              <div>
+                <label className="block text-slate-700 font-bold mb-1">Sector / Area Name in Sargodha *</label>
+                <input
+                  type="text"
+                  required
+                  value={zoneName}
+                  onChange={(e) => setZoneName(e.target.value)}
+                  placeholder="e.g. Satellite Town (Blocks A, B, C, D)"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:outline-none focus:bg-white focus:ring-1 focus:ring-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-bold mb-1">Covered Blocks, Streets & Localities *</label>
+                <input
+                  type="text"
+                  required
+                  value={zoneBlocks}
+                  onChange={(e) => setZoneBlocks(e.target.value)}
+                  placeholder="e.g. Main Commercial Market, Block A-Z Residential Sectors"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:outline-none focus:bg-white focus:ring-1 focus:ring-amber-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">OLT Distribution Node *</label>
+                  <input
+                    type="text"
+                    required
+                    value={zoneOltNode}
+                    onChange={(e) => setZoneOltNode(e.target.value)}
+                    placeholder="SGD-OLT-01 (Huawei MA5800)"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:outline-none focus:bg-white focus:ring-1 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Service Technology *</label>
+                  <select
+                    value={zoneStatus}
+                    onChange={(e) => setZoneStatus(e.target.value as 'Active GPON Fiber' | 'High-Speed FTTH')}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:outline-none focus:bg-white focus:ring-1 focus:ring-amber-500"
+                  >
+                    <option value="Active GPON Fiber">Active GPON Fiber</option>
+                    <option value="High-Speed FTTH">High-Speed FTTH</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Optical Rx Power *</label>
+                  <input
+                    type="text"
+                    required
+                    value={zoneSignal}
+                    onChange={(e) => setZoneSignal(e.target.value)}
+                    placeholder="-18.4 dBm (Optimal)"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:outline-none focus:bg-white focus:ring-1 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Core Ping Latency *</label>
+                  <input
+                    type="text"
+                    required
+                    value={zonePing}
+                    onChange={(e) => setZonePing(e.target.value)}
+                    placeholder="4 ms"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:outline-none focus:bg-white focus:ring-1 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowZoneModal(false)}
+                  className="px-4 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 text-slate-950 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-400 font-black rounded-xl shadow-md cursor-pointer"
+                >
+                  {editingZone ? 'Save Sector Changes' : 'Add Coverage Sector'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
-      {/* 6. ADD / EDIT TEAM MEMBER MODAL */}
+      {/* 8. ADD / EDIT TEAM MEMBER MODAL */}
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 sm:p-7 space-y-4 text-xs animate-in zoom-in-95">
@@ -772,7 +1310,7 @@ WantedBy=multi-user.target`}
                     required
                     value={formCnic}
                     onChange={(e) => setFormCnic(e.target.value)}
-                    placeholder="33100-1234567-1"
+                    placeholder="38403-1234567-1"
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:outline-none focus:bg-white focus:ring-1 focus:ring-purple-600"
                   />
                 </div>

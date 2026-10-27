@@ -13,11 +13,12 @@ import {
   FileCheck2,
   KeyRound
 } from 'lucide-react';
-import { ComplaintTicket, PTAMonthlyReport } from '../types/index.js';
+import { ComplaintTicket, PTAMonthlyReport, PTALicenseeConfig } from '../types/index.js';
 
 interface DashboardViewProps {
   tickets: ComplaintTicket[];
   report: PTAMonthlyReport | null;
+  config: PTALicenseeConfig | null;
   onSelectTicket: (ticket: ComplaintTicket) => void;
   onNavigateToTab: (tab: 'tickets' | 'reports' | 'customer' | 'server' | 'admin') => void;
   onOpenNewTicket: () => void;
@@ -26,10 +27,15 @@ interface DashboardViewProps {
 export const DashboardView: React.FC<DashboardViewProps> = ({
   tickets,
   report,
+  config,
   onSelectTicket,
   onNavigateToTab,
   onOpenNewTicket,
 }) => {
+  const activeLicense = config?.licenseNumber || report?.licensee?.licenseNumber || 'Class/Internet/11/2026/Sargodha';
+  const activeHelpline = config?.emergencyNocHelpline || report?.licensee?.emergencyNocHelpline || '03390480022';
+  const activeCoverage = config?.coverageHeadline || 'District Sargodha, Pakistan only';
+
   const activeTickets = tickets.filter(
     (t) => t.status === 'REGISTERED' || t.status === 'ASSIGNED' || t.status === 'IN_PROGRESS'
   );
@@ -76,18 +82,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Top Banner / District Context */}
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 mb-1">
             <span className="font-semibold text-emerald-800">PAKISTAN TELECOMMUNICATION AUTHORITY (PTA)</span>
             <span aria-hidden="true">·</span>
-            <span>Telecom Consumers Protection Regulations 2009</span>
+            <span className="font-mono font-bold text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+              License: {activeLicense}
+            </span>
             <span aria-hidden="true">·</span>
-            <span>District Sargodha, Pakistan CVAS</span>
+            <span className="font-bold text-amber-800">{activeCoverage}</span>
           </div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">
             NOC Customer Complaint Management & SLA Compliance Monitor
           </h1>
           <p className="text-sm text-slate-600 mt-0.5">
-            Real-time tracking of subscriber faults, optical outage dispatch, and automated regulatory filing.
+            Real-time tracking of subscriber faults, optical outage dispatch, and automated regulatory filing · 24/7 Helpline: <a href={`tel:${activeHelpline}`} className="font-mono font-bold text-emerald-700 hover:underline">{activeHelpline}</a>
           </p>
         </div>
 
@@ -97,7 +105,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             className="px-3.5 py-2 text-xs font-bold text-purple-900 bg-purple-100 hover:bg-purple-200 border border-purple-300 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-xs"
           >
             <KeyRound className="w-4 h-4 text-purple-700" />
-            <span>Team Logins & Passwords</span>
+            <span>Admin Console & Settings</span>
           </button>
           <button
             onClick={() => onNavigateToTab('reports')}
@@ -316,17 +324,33 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           {/* District Compliance Certificate Summary */}
           <div className="bg-emerald-950 text-white rounded-xl p-5 shadow-xs">
-            <div className="flex items-center gap-2 text-emerald-300 text-xs font-semibold uppercase tracking-wider mb-2">
-              <FileCheck2 className="w-4 h-4" />
-              <span>District CVAS License Status</span>
+            <div className="flex items-center justify-between gap-2 text-emerald-300 text-xs font-semibold uppercase tracking-wider mb-2">
+              <div className="flex items-center gap-2">
+                <FileCheck2 className="w-4 h-4" />
+                <span>District CVAS License Status</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onNavigateToTab('admin')}
+                className="text-[11px] font-bold text-amber-300 hover:underline lowercase cursor-pointer"
+              >
+                edit
+              </button>
             </div>
-            <div className="text-lg font-bold">License # CITRUS-2024</div>
+            <div className="text-base sm:text-lg font-bold font-mono text-amber-300 break-all">
+              License # {activeLicense}
+            </div>
             <p className="text-xs text-emerald-200/80 mt-1">
-              Citrus Pvt Ltd · District Sargodha, Pakistan jurisdiction. Complaint register maintained in accordance with PTA Telecom Act 1996 & TCPR 2009.
+              Citrus Pvt Ltd · {activeCoverage}. Complaint register maintained in accordance with PTA Telecom Act 1996 & TCPR 2009.
             </p>
             <div className="mt-4 pt-4 border-t border-emerald-800/60 flex items-center justify-between text-xs">
               <span className="text-emerald-300">24/7 NOC Helpline:</span>
-              <span className="font-mono font-bold text-amber-300">03390480022</span>
+              <a
+                href={`tel:${activeHelpline}`}
+                className="font-mono font-bold text-amber-300 hover:underline"
+              >
+                {activeHelpline}
+              </a>
             </div>
           </div>
         </div>

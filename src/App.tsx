@@ -133,6 +133,7 @@ export default function App() {
     try {
       const updated = await updateConfig(newConfig);
       setConfig(updated);
+      fetchPtaMonthlyReport().then((r) => setReport(r)).catch(() => {});
     } catch (err: any) {
       alert(err.message || 'Failed to update config');
       throw err;
@@ -344,6 +345,7 @@ export default function App() {
       <FrontPortalLogin
         users={users}
         tickets={mergedTickets}
+        config={config}
         onLoginCustomer={(cust, fbUid) => {
           setActiveCustomer(cust);
           setCustomerFirebaseUid(fbUid || null);
@@ -414,6 +416,7 @@ export default function App() {
           <CustomerPortalView
             users={users}
             tickets={mergedTickets}
+            config={config}
             currentCustomer={activeCustomer}
             onSelectCustomer={setActiveCustomer}
             onCreateCustomer={handleCreateCustomer}
@@ -470,6 +473,7 @@ export default function App() {
               <DashboardView
                 tickets={tickets}
                 report={report}
+                config={config}
                 onSelectTicket={(ticket) => {
                   setSelectedTicket(ticket);
                   setCurrentTab('tickets');
@@ -503,6 +507,7 @@ export default function App() {
               <CustomerPortalView
                 users={users}
                 tickets={mergedTickets}
+                config={config}
                 currentCustomer={activeCustomer}
                 onSelectCustomer={setActiveCustomer}
                 onCreateCustomer={handleCreateCustomer}
@@ -543,11 +548,13 @@ export default function App() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-extrabold text-slate-900">Citrus Pvt Ltd</span>
             <span aria-hidden="true">·</span>
-            <span className="font-bold text-amber-700">District Sargodha, Pakistan only</span>
+            <span className="font-mono font-bold text-indigo-700">{config?.licenseNumber || 'Class/Internet/11/2026/Sargodha'}</span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono font-bold text-slate-800">24/7 Helpline: 03390480022</span>
+            <span className="font-bold text-amber-700">{config?.coverageHeadline || 'District Sargodha, Pakistan only'}</span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono text-emerald-700">support.citrus@gmail.com</span>
+            <span className="font-mono font-bold text-slate-800">24/7 Helpline: {config?.emergencyNocHelpline || '03390480022'}</span>
+            <span aria-hidden="true">·</span>
+            <span className="font-mono text-emerald-700">{config?.complianceOfficerEmail || 'support.citrus@gmail.com'}</span>
           </div>
           {portalSession !== 'customer' && (
             <div className="flex items-center gap-4">
