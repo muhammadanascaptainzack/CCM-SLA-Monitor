@@ -1,10 +1,33 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
+  :root,
+  html.theme-ocean {
+    --portal-bg: #f1f5f9;
+    --portal-text: #0f172a;
+  }
+
+  html.theme-citrus {
+    --portal-bg: #fafaf9;
+    --portal-text: #0f172a;
+  }
+
+  html.theme-indigo {
+    --portal-bg: #f5f3ff;
+    --portal-text: #0f172a;
+  }
+
+  html.theme-dark {
+    --portal-bg: #020617;
+    --portal-text: #f8fafc;
+  }
+
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: #0f172a;
-    background-color: #f8fafc;
+    color: var(--portal-text);
+    background-color: var(--portal-bg);
+    transition: background-color 150ms ease, color 150ms ease;
   }
 }
 

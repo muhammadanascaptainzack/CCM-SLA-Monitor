@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-  ShieldCheck, 
   PlusCircle, 
   Server, 
   FileText, 
@@ -8,13 +7,11 @@ import {
   LayoutDashboard, 
   Ticket, 
   LogOut, 
-  User, 
   KeyRound,
-  Shield,
-  Radio,
   Mail
 } from 'lucide-react';
-import { UserRole, User as UserType, PTALicenseeConfig } from '../types/index.js';
+import { User as UserType, PTALicenseeConfig } from '../types/index.js';
+import { ThemeSwitcherButton, usePortalTheme } from '../context/ThemeContext.js';
 
 interface HeaderProps {
   currentTab: 'dashboard' | 'tickets' | 'customer' | 'reports' | 'users' | 'server' | 'admin';
@@ -35,13 +32,18 @@ export const Header: React.FC<HeaderProps> = ({
   onSwitchPortal,
   config,
 }) => {
+  const { theme } = usePortalTheme();
   const isAdmin = activeUser?.role === 'admin';
   const companyName = config?.licenseeName || 'Citrus Pvt Ltd';
   const companyLogoUrl = config?.companyLogoUrl || '';
   const companyLogoText = config?.companyLogoText || companyName.charAt(0).toUpperCase() || 'C';
 
   return (
-    <header className="no-print bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <header
+      className={`no-print sticky top-0 z-40 shadow-xs border-b transition-colors ${
+        theme.isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4 h-16">
           {/* Zone 1: Custom Company Logo + Brand Wordmark */}
@@ -54,18 +56,18 @@ export const Header: React.FC<HeaderProps> = ({
                 <img
                   src={companyLogoUrl}
                   alt={companyName}
-                  className="w-10 h-10 rounded-2xl object-contain bg-white border border-slate-200 p-0.5 shadow-sm"
+                  className="w-10 h-10 rounded-xl object-contain bg-white border border-slate-200 p-0.5 shadow-sm"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-md ring-2 ring-orange-400/40">
+                <div className={`w-10 h-10 rounded-xl ${theme.swatchBg} text-white flex items-center justify-center font-black text-xl shadow-md`}>
                   {companyLogoText}
                 </div>
               )}
               <div>
-                <span className="text-xl font-black tracking-tight text-slate-950 whitespace-nowrap block">
+                <span className={`text-xl font-black tracking-tight whitespace-nowrap block ${theme.isDark ? 'text-white' : 'text-slate-950'}`}>
                   {companyName}
                 </span>
-                <span className="text-[10px] text-slate-500 font-medium hidden sm:block">
+                <span className={`text-[10px] font-medium hidden sm:block ${theme.isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   {portalMode === 'customer' ? 'Customer Complaint Portal' : (config?.companyTagline || 'NOC & Staff Operations')}
                 </span>
               </div>
@@ -77,9 +79,9 @@ export const Header: React.FC<HeaderProps> = ({
             {portalMode === 'customer' ? (
               <button
                 onClick={() => onSelectTab('customer')}
-                className="px-3.5 py-2 text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer rounded-xl bg-emerald-100 text-emerald-950 shadow-xs border border-emerald-300"
+                className="px-3.5 py-2 text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer rounded-xl bg-emerald-600 text-white shadow-xs"
               >
-                <UserCheck className="w-4 h-4 text-emerald-600" />
+                <UserCheck className="w-4 h-4" />
                 <span>My Complaint Status</span>
               </button>
             ) : (
@@ -88,11 +90,13 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => onSelectTab('dashboard')}
                   className={`px-3 py-2 text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer rounded-xl ${
                     currentTab === 'dashboard'
-                      ? 'bg-amber-100 text-amber-950 font-black shadow-xs border border-amber-300'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : theme.isDark
+                      ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <LayoutDashboard className="w-4 h-4 text-amber-600" />
+                  <LayoutDashboard className="w-4 h-4" />
                   <span>NOC Dashboard</span>
                 </button>
 
@@ -100,26 +104,30 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => onSelectTab('tickets')}
                   className={`px-3 py-2 text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer rounded-xl ${
                     currentTab === 'tickets'
-                      ? 'bg-amber-100 text-amber-950 font-black shadow-xs border border-amber-300'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'bg-amber-500 text-slate-950 shadow-sm'
+                      : theme.isDark
+                      ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <Ticket className="w-4 h-4 text-amber-600" />
-                  <span>Complaint Queue (ACK & Update)</span>
+                  <Ticket className="w-4 h-4" />
+                  <span>Complaint Queue</span>
                 </button>
 
-                {/* ONLY visible to admin users. Normal team members cannot access */}
+                {/* ONLY visible to admin users */}
                 {isAdmin && (
                   <button
                     onClick={() => onSelectTab('admin')}
                     className={`px-3.5 py-2 text-xs font-black transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer rounded-xl ${
                       currentTab === 'admin'
-                        ? 'bg-purple-600 text-white shadow-md ring-2 ring-purple-400'
-                        : 'text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200'
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : theme.isDark
+                        ? 'text-purple-300 bg-purple-950/60 hover:bg-purple-900/60 border border-purple-700/50'
+                        : 'text-purple-800 bg-purple-50 hover:bg-purple-100 border border-purple-200'
                     }`}
                   >
-                    <KeyRound className="w-4 h-4 text-purple-600" />
-                    <span>Admin Console (Team Logins)</span>
+                    <KeyRound className="w-4 h-4" />
+                    <span>Admin Console</span>
                   </button>
                 )}
 
@@ -127,11 +135,13 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => onSelectTab('reports')}
                   className={`px-3 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer rounded-xl ${
                     currentTab === 'reports'
-                      ? 'bg-emerald-100 text-emerald-950 font-black shadow-xs border border-emerald-300'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : theme.isDark
+                      ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <FileText className="w-4 h-4 text-emerald-600" />
+                  <FileText className="w-4 h-4" />
                   <span>PTA Reports</span>
                 </button>
 
@@ -139,56 +149,54 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => onSelectTab('server')}
                   className={`px-3 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer rounded-xl ${
                     currentTab === 'server'
-                      ? 'bg-sky-100 text-sky-950 font-black shadow-xs border border-sky-300'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'bg-teal-600 text-white shadow-sm'
+                      : theme.isDark
+                      ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <Server className="w-4 h-4 text-sky-600" />
+                  <Server className="w-4 h-4" />
                   <span>Linux (Port 4000)</span>
                 </button>
               </>
             )}
           </nav>
 
-          {/* Zone 3: Active User & Primary Action */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          {/* Zone 3: Theme Switcher Icon, Active User & Primary Action */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Theme Switcher Icon Button */}
+            <ThemeSwitcherButton />
+
             {/* Active user badge */}
             {activeUser && (
-              <div className="hidden sm:flex items-center gap-2 text-xs bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                {portalMode === 'customer' ? (
-                  <>
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-                    <div className="flex flex-col text-left">
-                      <span className="font-black text-slate-900 truncate max-w-[120px] leading-tight">
-                        {activeUser.name}
-                      </span>
-                      <span className="text-[10px] text-slate-500 truncate max-w-[120px] leading-tight flex items-center gap-1">
+              <div
+                className={`hidden lg:flex items-center gap-2 text-xs px-3 py-1.5 rounded-xl border ${
+                  theme.isDark ? 'bg-slate-800 border-slate-700 text-slate-100' : 'bg-slate-100 border-slate-200 text-slate-900'
+                }`}
+              >
+                <div className="flex flex-col text-left">
+                  <span className="font-black truncate max-w-[110px] leading-tight">
+                    {activeUser.name}
+                  </span>
+                  <span className="text-[10px] opacity-75 truncate max-w-[110px] leading-tight flex items-center gap-1">
+                    {portalMode === 'customer' ? (
+                      <>
                         <Mail className="w-2.5 h-2.5 text-red-500 inline" />
                         {activeUser.email}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className={`w-2.5 h-2.5 rounded-full ${isAdmin ? 'bg-purple-600' : 'bg-amber-500'} shrink-0`} />
-                    <div className="flex flex-col text-left">
-                      <span className="font-black text-slate-900 truncate max-w-[120px] leading-tight">
-                        {activeUser.name}
-                      </span>
-                      <span className={`text-[9px] font-extrabold uppercase px-1 py-0.2 rounded w-fit ${
-                        isAdmin ? 'bg-purple-200 text-purple-900' : 'bg-amber-200 text-amber-900'
-                      }`}>
-                        {isAdmin ? 'System Admin' : activeUser.role}
-                      </span>
-                    </div>
-                  </>
-                )}
+                      </>
+                    ) : isAdmin ? (
+                      'System Admin'
+                    ) : (
+                      activeUser.role
+                    )}
+                  </span>
+                </div>
               </div>
             )}
 
             <button
               onClick={onOpenNewTicket}
-              className="px-3.5 py-2 text-xs font-black text-white bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl hover:from-emerald-500 hover:to-teal-500 active:scale-[0.98] transition-all flex items-center gap-1.5 shadow-md whitespace-nowrap shrink-0 cursor-pointer"
+              className={`px-3.5 py-2 text-xs font-black bg-gradient-to-r ${theme.primaryBtn} rounded-xl active:scale-[0.98] transition-all flex items-center gap-1.5 shadow-md whitespace-nowrap shrink-0 cursor-pointer`}
             >
               <PlusCircle className="w-4 h-4" />
               <span>{portalMode === 'customer' ? 'Lodge Complaint' : '+ New Ticket'}</span>
@@ -197,17 +205,25 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Logout button */}
             <button
               onClick={onSwitchPortal}
-              title="Log out and return to Citrus Introduction Homepage"
-              className="px-3 py-2 text-xs font-extrabold text-slate-700 hover:text-red-700 bg-slate-100 hover:bg-red-50 rounded-xl transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer border border-slate-200"
+              title="Log out and return to Homepage"
+              className={`px-3 py-2 text-xs font-extrabold rounded-xl transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer border ${
+                theme.isDark
+                  ? 'bg-slate-800 hover:bg-rose-950/80 text-slate-200 hover:text-rose-300 border-slate-700'
+                  : 'bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 border-slate-200'
+              }`}
             >
-              <LogOut className="w-3.5 h-3.5 text-slate-500 group-hover:text-red-500" />
-              <span>Log Out</span>
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Log Out</span>
             </button>
           </div>
         </div>
 
         {/* Mobile secondary navigation */}
-        <div className="md:hidden flex items-center gap-1.5 overflow-x-auto py-2.5 border-t border-slate-100 text-xs">
+        <div
+          className={`md:hidden flex items-center gap-1.5 overflow-x-auto py-2.5 border-t text-xs ${
+            theme.isDark ? 'border-slate-800' : 'border-slate-100'
+          }`}
+        >
           {portalMode === 'customer' ? (
             <button
               onClick={() => onSelectTab('customer')}
@@ -219,13 +235,13 @@ export const Header: React.FC<HeaderProps> = ({
             <>
               <button
                 onClick={() => onSelectTab('dashboard')}
-                className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'dashboard' ? 'bg-amber-600 text-white' : 'text-slate-600 bg-slate-100'}`}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'dashboard' ? 'bg-blue-600 text-white' : theme.isDark ? 'text-slate-300 bg-slate-800' : 'text-slate-600 bg-slate-100'}`}
               >
                 NOC Dashboard
               </button>
               <button
                 onClick={() => onSelectTab('tickets')}
-                className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'tickets' ? 'bg-amber-600 text-white' : 'text-slate-600 bg-slate-100'}`}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'tickets' ? 'bg-amber-500 text-slate-950' : theme.isDark ? 'text-slate-300 bg-slate-800' : 'text-slate-600 bg-slate-100'}`}
               >
                 Queue (ACK)
               </button>
@@ -234,18 +250,18 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => onSelectTab('admin')}
                   className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'admin' ? 'bg-purple-600 text-white' : 'text-purple-700 bg-purple-50 font-bold'}`}
                 >
-                  Admin (Team Logins)
+                  Admin Console
                 </button>
               )}
               <button
                 onClick={() => onSelectTab('reports')}
-                className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'reports' ? 'bg-emerald-600 text-white' : 'text-slate-600 bg-slate-100'}`}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'reports' ? 'bg-emerald-600 text-white' : theme.isDark ? 'text-slate-300 bg-slate-800' : 'text-slate-600 bg-slate-100'}`}
               >
                 PTA Reports
               </button>
               <button
                 onClick={() => onSelectTab('server')}
-                className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'server' ? 'bg-sky-600 text-white' : 'text-slate-600 bg-slate-100'}`}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold ${currentTab === 'server' ? 'bg-teal-600 text-white' : theme.isDark ? 'text-slate-300 bg-slate-800' : 'text-slate-600 bg-slate-100'}`}
               >
                 Linux (Port 4000)
               </button>

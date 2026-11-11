@@ -40,6 +40,11 @@ import {
   CustomComplaintCategoryConfig,
   CustomFaqItem,
 } from '../types/index.js';
+import {
+  usePortalTheme,
+  PORTAL_THEMES,
+  PortalThemeId,
+} from '../context/ThemeContext.js';
 
 const ALL_DISTRICTS: DistrictName[] = [
   'Sargodha',
@@ -211,6 +216,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   onSwitchToUser,
   onBackToDashboard,
 }) => {
+  const { theme, themeId, setThemeId } = usePortalTheme();
   const [activeTab, setActiveTab] = useState<'branding' | 'complaints' | 'team' | 'coverage' | 'ports'>('branding');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -244,6 +250,38 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   const [heroDescription, setHeroDescription] = useState(
     config?.heroDescription ||
       'Sign in with your personal Gmail account to lodge fiber complaints and track your live resolution status with 100% private cloud protection.'
+  );
+
+  // 3-Step Process Section ("How Customer Complaint Tracking Works") state
+  const [processBadge, setProcessBadge] = useState(config?.processBadge || '100% Private & Cloud Protected');
+  const [processTitle, setProcessTitle] = useState(
+    config?.processTitle || `How ${config?.registeredDistrict || 'Sargodha'} Customer Complaint Tracking Works`
+  );
+  const [processSubtitle, setProcessSubtitle] = useState(
+    config?.processSubtitle ||
+      'Every customer has a private account linked to their Gmail. You see only your own complaint status — nothing else.'
+  );
+  const [step1Title, setStep1Title] = useState(config?.step1Title || 'Sign In with Your Gmail');
+  const [step1Desc, setStep1Desc] = useState(
+    config?.step1Desc ||
+      `Click the top button to sign in with Google or register your Gmail address in ${config?.coverageHeadline || 'District Sargodha'}. Your account is strictly private.`
+  );
+  const [step1Badge, setStep1Badge] = useState(config?.step1Badge || 'Private Google Cloud Account');
+  const [step2Title, setStep2Title] = useState(config?.step2Title || 'Lodge Fault & Cloud Sync');
+  const [step2Desc, setStep2Desc] = useState(
+    config?.step2Desc ||
+      'Submit fiber cut, red LOS light, or slow speed complaints. Every ticket is saved to Google Cloud Firestore under your Gmail.'
+  );
+  const [step2Badge, setStep2Badge] = useState(
+    config?.step2Badge || `24/7 Helpline: ${config?.emergencyNocHelpline || '03390480022'}`
+  );
+  const [step3Title, setStep3Title] = useState(config?.step3Title || 'Live Complaint Status');
+  const [step3Desc, setStep3Desc] = useState(
+    config?.step3Desc ||
+      `${config?.companyShortName || 'Citrus'} ${config?.registeredDistrict || 'Sargodha'} NOC engineers acknowledge (ACK) your complaint, dispatch field splicers, and update your complaint status live.`
+  );
+  const [step3Badge, setStep3Badge] = useState(
+    config?.step3Badge || `Fast ${config?.registeredDistrict || 'Sargodha'} Field Dispatch`
   );
 
   // License & Helpline config state
@@ -318,6 +356,32 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
         config.heroDescription ||
           'Sign in with your personal Gmail account to lodge fiber complaints and track your live resolution status with 100% private cloud protection.'
       );
+      setProcessBadge(config.processBadge || '100% Private & Cloud Protected');
+      setProcessTitle(
+        config.processTitle || `How ${config.registeredDistrict || 'Sargodha'} Customer Complaint Tracking Works`
+      );
+      setProcessSubtitle(
+        config.processSubtitle ||
+          'Every customer has a private account linked to their Gmail. You see only your own complaint status — nothing else.'
+      );
+      setStep1Title(config.step1Title || 'Sign In with Your Gmail');
+      setStep1Desc(
+        config.step1Desc ||
+          `Click the top button to sign in with Google or register your Gmail address in ${config.coverageHeadline || 'District Sargodha'}. Your account is strictly private.`
+      );
+      setStep1Badge(config.step1Badge || 'Private Google Cloud Account');
+      setStep2Title(config.step2Title || 'Lodge Fault & Cloud Sync');
+      setStep2Desc(
+        config.step2Desc ||
+          'Submit fiber cut, red LOS light, or slow speed complaints. Every ticket is saved to Google Cloud Firestore under your Gmail.'
+      );
+      setStep2Badge(config.step2Badge || `24/7 Helpline: ${config.emergencyNocHelpline || '03390480022'}`);
+      setStep3Title(config.step3Title || 'Live Complaint Status');
+      setStep3Desc(
+        config.step3Desc ||
+          `${config.companyShortName || 'Citrus'} ${config.registeredDistrict || 'Sargodha'} NOC engineers acknowledge (ACK) your complaint, dispatch field splicers, and update your complaint status live.`
+      );
+      setStep3Badge(config.step3Badge || `Fast ${config.registeredDistrict || 'Sargodha'} Field Dispatch`);
       setHelpline(config.emergencyNocHelpline || '03390480022');
       setLicenseNumber(config.licenseNumber || 'Class/Internet/11/2026/Sargodha');
       setLicenseType(config.licenseType || 'District CVAS (Class Value Added Services - Data & Internet)');
@@ -396,6 +460,18 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
       heroTitle,
       heroHighlight,
       heroDescription,
+      processBadge,
+      processTitle,
+      processSubtitle,
+      step1Title,
+      step1Desc,
+      step1Badge,
+      step2Title,
+      step2Desc,
+      step2Badge,
+      step3Title,
+      step3Desc,
+      step3Badge,
       licenseNumber,
       licenseType,
       registeredDistrict,
@@ -535,6 +611,26 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
         heroTitle: heroTitle.trim() || 'Ultra-Fast Optical Fiber Internet in',
         heroHighlight: heroHighlight.trim() || `District ${registeredDistrict}`,
         heroDescription: heroDescription.trim(),
+        processBadge: processBadge.trim() || '100% Private & Cloud Protected',
+        processTitle: processTitle.trim() || `How ${registeredDistrict} Customer Complaint Tracking Works`,
+        processSubtitle:
+          processSubtitle.trim() ||
+          'Every customer has a private account linked to their Gmail. You see only your own complaint status — nothing else.',
+        step1Title: step1Title.trim() || 'Sign In with Your Gmail',
+        step1Desc:
+          step1Desc.trim() ||
+          `Click the top button to sign in with Google or register your Gmail address in ${cleanHeadline}. Your account is strictly private.`,
+        step1Badge: step1Badge.trim() || 'Private Google Cloud Account',
+        step2Title: step2Title.trim() || 'Lodge Fault & Cloud Sync',
+        step2Desc:
+          step2Desc.trim() ||
+          'Submit fiber cut, red LOS light, or slow speed complaints. Every ticket is saved to Google Cloud Firestore under your Gmail.',
+        step2Badge: step2Badge.trim() || `24/7 Helpline: ${cleanHelpline}`,
+        step3Title: step3Title.trim() || 'Live Complaint Status',
+        step3Desc:
+          step3Desc.trim() ||
+          `${cleanShort} ${registeredDistrict} NOC engineers acknowledge (ACK) your complaint, dispatch field splicers, and update your complaint status live.`,
+        step3Badge: step3Badge.trim() || `Fast ${registeredDistrict} Field Dispatch`,
         emergencyNocHelpline: cleanHelpline,
         complianceOfficerPhone: cleanHelpline,
         licenseNumber: cleanLicense,
@@ -765,27 +861,27 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   return (
     <div className="space-y-6">
       {/* 1. TOP HERO BANNER - CUSTOMIZABLE WHITE-LABEL COMMAND CONSOLE */}
-      <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden border-2 border-purple-500/40">
+      <div className={`bg-gradient-to-r ${theme.heroGradient} text-white rounded-2xl p-6 sm:p-7 shadow-xl relative overflow-hidden border border-white/15`}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-1 bg-purple-500/30 text-purple-200 rounded-full text-xs font-black border border-purple-400/50 uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
-                <ShieldCheck className="w-4 h-4 text-purple-300" />
+              <span className="px-3 py-1 bg-white/15 text-white rounded-lg text-xs font-black border border-white/25 uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
+                <ShieldCheck className="w-4 h-4 text-amber-300" />
                 <span>{activeCompanyDisplay} · Admin Command Console</span>
               </span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold border border-amber-400/40">
+              <span className="text-xs px-2.5 py-1 rounded-lg bg-amber-500/25 text-amber-200 font-mono font-bold border border-amber-400/40">
                 License: {activeLicenseDisplay}
               </span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono font-bold border border-emerald-500/40">
+              <span className="text-xs px-2.5 py-1 rounded-lg bg-emerald-500/25 text-emerald-200 font-mono font-bold border border-emerald-400/40">
                 24/7 Helpline: {activeHelplineDisplay}
               </span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Full Company Brand, Logo & Complaint Portal Customizer
+              Admin Panel · Colorful Box Dashboard & Brand Customizer
             </h1>
-            <p className="text-xs sm:text-sm text-purple-200/90 max-w-2xl leading-relaxed">
-              Customize your company logo, brand name, license details, 24/7 helpline, ticket prefixes, SLA timers, bandwidth packages, and coverage zones — no developer or AI needed.
+            <p className="text-xs sm:text-sm text-slate-200 max-w-2xl leading-relaxed">
+              Click any colored box below to customize your company logo, brand name, license details, 24/7 helpline, SLA timers, coverage zones, staff logins, or global portal theme.
             </p>
           </div>
 
@@ -793,7 +889,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
             {onBackToDashboard && (
               <button
                 onClick={onBackToDashboard}
-                className="px-4 py-2.5 text-xs font-extrabold text-purple-200 bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="px-4 py-2.5 text-xs font-extrabold text-white bg-white/15 hover:bg-white/25 border border-white/25 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>NOC Dashboard</span>
@@ -803,14 +899,14 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
             <button
               type="button"
               onClick={handleExportSettingsJson}
-              className="px-3.5 py-2.5 text-xs font-extrabold text-emerald-200 bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/40 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2.5 text-xs font-extrabold text-emerald-100 bg-emerald-900/70 hover:bg-emerald-800 border border-emerald-400/40 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
               title="Download all company & complaint settings as a backup JSON file"
             >
               <Download className="w-4 h-4" />
               <span>Export Config</span>
             </button>
 
-            <label className="px-3.5 py-2.5 text-xs font-extrabold text-sky-200 bg-sky-950/70 hover:bg-sky-900 border border-sky-500/40 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer">
+            <label className="px-3.5 py-2.5 text-xs font-extrabold text-sky-100 bg-sky-900/70 hover:bg-sky-800 border border-sky-400/40 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer">
               <Upload className="w-4 h-4" />
               <span>Import Config</span>
               <input
@@ -824,150 +920,228 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
             <button
               onClick={() => handleSaveAllCustomizations()}
               disabled={isSavingConfig}
-              className="px-5 py-2.5 text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-300 hover:to-orange-400 rounded-xl transition-all shadow-xl hover:shadow-orange-500/30 flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer active:scale-95"
+              className="px-5 py-2.5 text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-300 hover:to-orange-400 rounded-xl transition-all shadow-xl flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer active:scale-95"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>{isSavingConfig ? 'Saving All Changes...' : 'Save All Customizations'}</span>
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Quick KPI Status Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-6 border-t border-purple-800/60">
-          <div
-            onClick={() => setActiveTab('branding')}
-            className="bg-purple-950/60 hover:bg-purple-900/70 backdrop-blur-sm p-4 rounded-2xl border border-purple-500/50 cursor-pointer transition-colors flex items-center gap-3"
-          >
+      {/* 2. GLOBAL PORTAL THEME BAR (APPLIES TO HOME, CUSTOMER & ADMIN PAGES) */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white flex items-center justify-center shadow-sm shrink-0">
+            <Palette className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-black text-slate-900 dark:text-white">
+                Global Portal Theme (Home Page + Customer Portal + Admin Panel)
+              </h2>
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                Active: {theme.name}
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Select a clean, easy-to-perceive visual theme below or use the Theme Icon in the top navigation bar on any page.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 shrink-0">
+          {(Object.keys(PORTAL_THEMES) as PortalThemeId[]).map((id) => {
+            const item = PORTAL_THEMES[id];
+            const isSelected = themeId === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setThemeId(id)}
+                className={`px-3 py-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
+                  isSelected
+                    ? 'border-sky-500 bg-sky-50/90 dark:bg-sky-950/60 dark:border-sky-400 ring-2 ring-sky-500/20 shadow-xs'
+                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <div className="flex items-center -space-x-1 shrink-0">
+                  {item.swatchColors.map((hex, i) => (
+                    <span
+                      key={i}
+                      className="w-4 h-4 rounded-full border border-white dark:border-slate-900 shadow-2xs"
+                      style={{ backgroundColor: hex }}
+                    />
+                  ))}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-black text-slate-900 dark:text-white truncate">
+                    {item.shortLabel}
+                  </div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                    {isSelected ? 'Applied Live' : 'Click to Apply'}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. COLORFUL BOX-SHAPED ADMIN MODULE SELECTOR GRID (5 DISTINCT COLOR BOXES) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* BOX 1: PURPLE / INDIGO - COMPANY BRAND & LOGO */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('branding')}
+          className={`text-left rounded-2xl p-5 text-white bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer border-2 flex flex-col justify-between min-h-[155px] ${
+            activeTab === 'branding' ? 'border-white ring-4 ring-purple-500/30' : 'border-purple-400/30'
+          }`}
+        >
+          <div className="flex items-start justify-between gap-2 w-full">
+            <span className="text-[11px] font-black uppercase tracking-wider text-purple-100 bg-white/15 px-2.5 py-1 rounded-lg">
+              Box 1 · Identity
+            </span>
             {companyLogoUrl ? (
               <img
                 src={companyLogoUrl}
                 alt={activeCompanyDisplay}
-                className="w-12 h-12 rounded-2xl object-contain bg-white p-1 shrink-0"
+                className="w-10 h-10 rounded-xl object-contain bg-white p-1 shrink-0 shadow-md"
               />
             ) : (
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center font-black text-xl shrink-0">
-                {companyLogoText || activeCompanyDisplay.charAt(0)}
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-black text-lg text-white shrink-0">
+                <Palette className="w-5 h-5" />
               </div>
             )}
-            <div className="min-w-0">
-              <div className="text-xs font-bold text-purple-300 flex items-center justify-between gap-2">
-                <span>Company Identity</span>
-                <span className="text-[10px] underline">Customize</span>
-              </div>
-              <div className="text-base font-black text-white truncate mt-0.5">{activeCompanyDisplay}</div>
-              <div className="text-[11px] text-purple-300 truncate">{companyTagline}</div>
-            </div>
           </div>
-
-          <div
-            onClick={() => setActiveTab('complaints')}
-            className="bg-purple-950/60 hover:bg-purple-900/70 backdrop-blur-sm p-4 rounded-2xl border border-amber-500/40 cursor-pointer transition-colors"
-          >
-            <div className="text-xs font-bold text-amber-300 flex items-center justify-between">
-              <span>Complaint & SLA Variables</span>
-              <span className="text-[10px] underline">Edit Rules</span>
-            </div>
-            <div className="text-base font-black text-white mt-1 font-mono">
-              {ticketPrefix}-2026-XXXX
-            </div>
-            <div className="text-[11px] text-amber-200">
-              SLA: P1={slaTargetP1Hours}h · P2={slaTargetP2Hours}h · P3={slaTargetP3Hours}h
-            </div>
+          <div className="my-2">
+            <div className="text-base font-black text-white truncate">{activeCompanyDisplay}</div>
+            <div className="text-[11px] text-purple-100 truncate mt-0.5">{companyTagline}</div>
           </div>
-
-          <div
-            onClick={() => setActiveTab('coverage')}
-            className="bg-purple-950/60 hover:bg-purple-900/70 backdrop-blur-sm p-4 rounded-2xl border border-emerald-500/40 cursor-pointer transition-colors"
-          >
-            <div className="text-xs font-bold text-emerald-300 flex items-center justify-between">
-              <span>Coverage Network</span>
-              <span className="text-[10px] underline">Edit Sectors</span>
-            </div>
-            <div className="text-base font-black text-white mt-1 truncate">
-              {activeCoverageHeadlineDisplay}
-            </div>
-            <div className="text-[11px] text-emerald-200">{coverageZones.length} Active Fiber OLT Sectors</div>
+          <div className="pt-2 border-t border-white/15 flex items-center justify-between text-[11px] font-bold text-purple-100 w-full">
+            <span>Logo, Name & License</span>
+            <span className="underline">{activeTab === 'branding' ? 'Active' : 'Open →'}</span>
           </div>
-
-          <div
-            onClick={() => setActiveTab('team')}
-            className="bg-purple-950/60 hover:bg-purple-900/70 backdrop-blur-sm p-4 rounded-2xl border border-sky-500/40 cursor-pointer transition-colors"
-          >
-            <div className="text-xs font-bold text-sky-300 flex items-center justify-between">
-              <span>Staff & Subscribers</span>
-              <span className="text-[10px] underline">Manage Team</span>
-            </div>
-            <div className="text-xl font-black text-white mt-1 font-mono">{staffMembers.length} Staff</div>
-            <div className="text-[11px] text-sky-200">{customerCount} Registered Subscribers</div>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. TAB SWITCHER */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 text-xs font-extrabold">
-        <button
-          type="button"
-          onClick={() => setActiveTab('branding')}
-          className={`px-4 py-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'branding'
-              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <Palette className="w-4 h-4" />
-          <span>1. Company Logo, Name & Details</span>
         </button>
 
+        {/* BOX 2: AMBER / ORANGE - COMPLAINT & SLA VARIABLES */}
         <button
           type="button"
           onClick={() => setActiveTab('complaints')}
-          className={`px-4 py-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'complaints'
-              ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md font-black'
-              : 'text-slate-600 hover:text-slate-900'
+          className={`text-left rounded-2xl p-5 text-white bg-gradient-to-br from-amber-500 via-orange-500 to-orange-600 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer border-2 flex flex-col justify-between min-h-[155px] ${
+            activeTab === 'complaints' ? 'border-white ring-4 ring-amber-500/30' : 'border-amber-300/30'
           }`}
         >
-          <Sliders className="w-4 h-4" />
-          <span>2. Complaint Variables, SLA & Packages</span>
+          <div className="flex items-start justify-between gap-2 w-full">
+            <span className="text-[11px] font-black uppercase tracking-wider text-amber-950 bg-white/85 px-2.5 py-1 rounded-lg">
+              Box 2 · SLA Rules
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <Sliders className="w-5 h-5 text-white" />
+            </div>
+          </div>
+          <div className="my-2">
+            <div className="text-base font-black text-white font-mono truncate">
+              {ticketPrefix}-2026-XXXX
+            </div>
+            <div className="text-[11px] text-amber-50 font-semibold mt-0.5">
+              P1: {slaTargetP1Hours}h · P2: {slaTargetP2Hours}h · P3: {slaTargetP3Hours}h
+            </div>
+          </div>
+          <div className="pt-2 border-t border-white/20 flex items-center justify-between text-[11px] font-bold text-white w-full">
+            <span>{bandwidthPlans.length} Fiber Packages</span>
+            <span className="underline">{activeTab === 'complaints' ? 'Active' : 'Open →'}</span>
+          </div>
         </button>
 
+        {/* BOX 3: EMERALD / TEAL - COVERAGE NETWORK */}
         <button
           type="button"
           onClick={() => setActiveTab('coverage')}
-          className={`px-4 py-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'coverage'
-              ? 'bg-emerald-600 text-white shadow-md'
-              : 'text-slate-600 hover:text-slate-900'
+          className={`text-left rounded-2xl p-5 text-white bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer border-2 flex flex-col justify-between min-h-[155px] ${
+            activeTab === 'coverage' ? 'border-white ring-4 ring-emerald-500/30' : 'border-emerald-400/30'
           }`}
         >
-          <MapPin className="w-4 h-4" />
-          <span>3. Coverage Network ({coverageZones.length})</span>
+          <div className="flex items-start justify-between gap-2 w-full">
+            <span className="text-[11px] font-black uppercase tracking-wider text-emerald-100 bg-white/15 px-2.5 py-1 rounded-lg">
+              Box 3 · Coverage
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <MapPin className="w-5 h-5 text-white" />
+            </div>
+          </div>
+          <div className="my-2">
+            <div className="text-base font-black text-white truncate">
+              {coverageZones.length} OLT Sectors
+            </div>
+            <div className="text-[11px] text-emerald-100 truncate mt-0.5">
+              {activeCoverageHeadlineDisplay}
+            </div>
+          </div>
+          <div className="pt-2 border-t border-white/15 flex items-center justify-between text-[11px] font-bold text-emerald-100 w-full">
+            <span>Add / Edit Sectors</span>
+            <span className="underline">{activeTab === 'coverage' ? 'Active' : 'Open →'}</span>
+          </div>
         </button>
 
+        {/* BOX 4: ROYAL BLUE / SKY - TEAM LOGINS & SUBSCRIBERS */}
         <button
           type="button"
           onClick={() => setActiveTab('team')}
-          className={`px-4 py-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'team'
-              ? 'bg-sky-600 text-white shadow-md'
-              : 'text-slate-600 hover:text-slate-900'
+          className={`text-left rounded-2xl p-5 text-white bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer border-2 flex flex-col justify-between min-h-[155px] ${
+            activeTab === 'team' ? 'border-white ring-4 ring-blue-500/30' : 'border-blue-400/30'
           }`}
         >
-          <Users className="w-4 h-4" />
-          <span>4. Team Logins ({staffMembers.length})</span>
+          <div className="flex items-start justify-between gap-2 w-full">
+            <span className="text-[11px] font-black uppercase tracking-wider text-blue-100 bg-white/15 px-2.5 py-1 rounded-lg">
+              Box 4 · Accounts
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <Users className="w-5 h-5 text-white" />
+            </div>
+          </div>
+          <div className="my-2">
+            <div className="text-xl font-black text-white font-mono">
+              {staffMembers.length} Staff Logins
+            </div>
+            <div className="text-[11px] text-blue-100 mt-0.5">
+              {customerCount} Registered Subscribers
+            </div>
+          </div>
+          <div className="pt-2 border-t border-white/15 flex items-center justify-between text-[11px] font-bold text-blue-100 w-full">
+            <span>Manage Passwords</span>
+            <span className="underline">{activeTab === 'team' ? 'Active' : 'Open →'}</span>
+          </div>
         </button>
 
+        {/* BOX 5: CRIMSON / SLATE - PORT 4000 & LINUX HOST */}
         <button
           type="button"
           onClick={() => setActiveTab('ports')}
-          className={`px-4 py-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'ports'
-              ? 'bg-slate-900 text-white shadow-md'
-              : 'text-slate-600 hover:text-slate-900'
+          className={`text-left rounded-2xl p-5 text-white bg-gradient-to-br from-rose-600 via-rose-700 to-slate-900 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer border-2 flex flex-col justify-between min-h-[155px] ${
+            activeTab === 'ports' ? 'border-white ring-4 ring-rose-500/30' : 'border-rose-400/30'
           }`}
         >
-          <Server className="w-4 h-4" />
-          <span>5. Port 4000 & Linux Host</span>
+          <div className="flex items-start justify-between gap-2 w-full">
+            <span className="text-[11px] font-black uppercase tracking-wider text-rose-100 bg-white/15 px-2.5 py-1 rounded-lg">
+              Box 5 · Server
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <Server className="w-5 h-5 text-white" />
+            </div>
+          </div>
+          <div className="my-2">
+            <div className="text-base font-black text-white font-mono">
+              TCP Port 4000
+            </div>
+            <div className="text-[11px] text-rose-100 truncate mt-0.5">
+              Helpline: {activeHelplineDisplay}
+            </div>
+          </div>
+          <div className="pt-2 border-t border-white/15 flex items-center justify-between text-[11px] font-bold text-rose-100 w-full">
+            <span>Linux & PM2 Guide</span>
+            <span className="underline">{activeTab === 'ports' ? 'Active' : 'Open →'}</span>
+          </div>
         </button>
       </div>
 
@@ -1361,6 +1535,219 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                     onChange={(e) => setHeroDescription(e.target.value)}
                     placeholder="Sign in with your personal Gmail account to lodge fiber complaints..."
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:bg-white focus:outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* FULL-WIDTH BOX: 3-STEP CUSTOMER TRACKING PROCESS CUSTOMIZER ("How Customer Complaint Tracking Works") */}
+          <div className="bg-white border-2 border-emerald-200 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5 text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-black shadow-sm">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-base font-black text-slate-900">
+                    3-Step Process Section Customizer ("How Customer Complaint Tracking Works")
+                  </h2>
+                  <p className="text-slate-500">
+                    Customize the "100% Private & Cloud Protected" section heading, subtitle, and all 3 step boxes shown on the homepage
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const short = companyShortName.trim() || 'Citrus';
+                  const dist = registeredDistrict || 'Sargodha';
+                  const hl = helpline.trim() || '03390480022';
+                  setProcessBadge('100% Private & Cloud Protected');
+                  setProcessTitle(`How ${dist} Customer Complaint Tracking Works`);
+                  setProcessSubtitle(
+                    'Every customer has a private account linked to their Gmail. You see only your own complaint status — nothing else.'
+                  );
+                  setStep1Title('Sign In with Your Gmail');
+                  setStep1Desc(
+                    `Click the top button to sign in with Google or register your Gmail address in District ${dist}. Your account is strictly private.`
+                  );
+                  setStep1Badge('Private Google Cloud Account');
+                  setStep2Title('Lodge Fault & Cloud Sync');
+                  setStep2Desc(
+                    'Submit fiber cut, red LOS light, or slow speed complaints. Every ticket is saved to Google Cloud Firestore under your Gmail.'
+                  );
+                  setStep2Badge(`24/7 Helpline: ${hl}`);
+                  setStep3Title('Live Complaint Status');
+                  setStep3Desc(
+                    `${short} ${dist} NOC engineers acknowledge (ACK) your complaint, dispatch field splicers, and update your complaint status live.`
+                  );
+                  setStep3Badge(`Fast ${dist} Field Dispatch`);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-extrabold text-xs flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Auto-Fill with Current Brand & Helpline</span>
+              </button>
+            </div>
+
+            {/* Section Header Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-slate-700 font-bold mb-1">
+                  Top Section Badge Text
+                </label>
+                <input
+                  type="text"
+                  value={processBadge}
+                  onChange={(e) => setProcessBadge(e.target.value)}
+                  placeholder="100% Private & Cloud Protected"
+                  className="w-full px-3.5 py-2.5 bg-emerald-50/50 border border-emerald-300 rounded-xl text-slate-900 font-bold focus:bg-white focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-bold mb-1">
+                  Main Section Heading
+                </label>
+                <input
+                  type="text"
+                  value={processTitle}
+                  onChange={(e) => setProcessTitle(e.target.value)}
+                  placeholder="How Sargodha Customer Complaint Tracking Works"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-black focus:bg-white focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-bold mb-1">
+                  Section Subtitle
+                </label>
+                <input
+                  type="text"
+                  value={processSubtitle}
+                  onChange={(e) => setProcessSubtitle(e.target.value)}
+                  placeholder="Every customer has a private account linked to their Gmail..."
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:bg-white focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* 3 Colorful Step Box Editors */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              {/* Step 1 Box Editor */}
+              <div className="p-4 rounded-2xl bg-emerald-50/60 border-2 border-emerald-200 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-lg bg-emerald-600 text-white font-black flex items-center justify-center text-xs">
+                    1
+                  </span>
+                  <span className="font-black text-emerald-950 text-xs uppercase tracking-wider">
+                    Step 1 Box (Green)
+                  </span>
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Step 1 Title</label>
+                  <input
+                    type="text"
+                    value={step1Title}
+                    onChange={(e) => setStep1Title(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-emerald-200 rounded-xl text-slate-900 font-bold focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Step 1 Description</label>
+                  <textarea
+                    rows={3}
+                    value={step1Desc}
+                    onChange={(e) => setStep1Desc(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-emerald-200 rounded-xl text-slate-900 font-medium focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Step 1 Bottom Badge</label>
+                  <input
+                    type="text"
+                    value={step1Badge}
+                    onChange={(e) => setStep1Badge(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-emerald-200 rounded-xl text-emerald-900 font-extrabold focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Step 2 Box Editor */}
+              <div className="p-4 rounded-2xl bg-amber-50/60 border-2 border-amber-200 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-lg bg-orange-500 text-white font-black flex items-center justify-center text-xs">
+                    2
+                  </span>
+                  <span className="font-black text-amber-950 text-xs uppercase tracking-wider">
+                    Step 2 Box (Amber)
+                  </span>
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Step 2 Title</label>
+                  <input
+                    type="text"
+                    value={step2Title}
+                    onChange={(e) => setStep2Title(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-amber-200 rounded-xl text-slate-900 font-bold focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Step 2 Description</label>
+                  <textarea
+                    rows={3}
+                    value={step2Desc}
+                    onChange={(e) => setStep2Desc(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-amber-200 rounded-xl text-slate-900 font-medium focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Step 2 Bottom Badge (Helpline)</label>
+                  <input
+                    type="text"
+                    value={step2Badge}
+                    onChange={(e) => setStep2Badge(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-amber-200 rounded-xl text-orange-900 font-extrabold focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Step 3 Box Editor */}
+              <div className="p-4 rounded-2xl bg-purple-50/60 border-2 border-purple-200 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-lg bg-purple-600 text-white font-black flex items-center justify-center text-xs">
+                    3
+                  </span>
+                  <span className="font-black text-purple-950 text-xs uppercase tracking-wider">
+                    Step 3 Box (Purple)
+                  </span>
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Step 3 Title</label>
+                  <input
+                    type="text"
+                    value={step3Title}
+                    onChange={(e) => setStep3Title(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-purple-200 rounded-xl text-slate-900 font-bold focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Step 3 Description</label>
+                  <textarea
+                    rows={3}
+                    value={step3Desc}
+                    onChange={(e) => setStep3Desc(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-purple-200 rounded-xl text-slate-900 font-medium focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Step 3 Bottom Badge</label>
+                  <input
+                    type="text"
+                    value={step3Badge}
+                    onChange={(e) => setStep3Badge(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-purple-200 rounded-xl text-purple-900 font-extrabold focus:outline-none"
                   />
                 </div>
               </div>

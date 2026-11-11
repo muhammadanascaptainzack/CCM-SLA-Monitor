@@ -46,6 +46,7 @@ import {
   getCloudCustomerProfile,
   saveCloudCustomerProfile,
 } from '../firebase.js';
+import { usePortalTheme, ThemeSwitcherButton } from '../context/ThemeContext.js';
 
 interface FrontPortalLoginProps {
   users: UserType[];
@@ -207,6 +208,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   onCreateCustomer,
   onLodgeQuickComplaint,
 }) => {
+  const { theme } = usePortalTheme();
   // Page Views:
   // 'intro' = Main Citrus Introduction Page with Top Customer CTA & Bottom Staff Link
   // 'customer_auth' = Private Customer Gmail Login & Registration (Cloud Synced)
@@ -264,11 +266,12 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
   const activeCompanyName = config?.licenseeName || 'Citrus Pvt Ltd';
   const activeShortName = config?.companyShortName || 'Citrus';
+  const activeDistrict = config?.registeredDistrict || 'Sargodha';
   const activeLogoUrl = config?.companyLogoUrl || '';
   const activeLogoText = config?.companyLogoText || activeCompanyName.charAt(0).toUpperCase() || 'C';
   const activeTagline = config?.companyTagline || 'High-Speed FTTH Fiber Broadband';
   const activeHeroTitle = config?.heroTitle || 'Ultra-Fast Optical Fiber Internet in';
-  const activeHeroHighlight = config?.heroHighlight || 'District Sargodha';
+  const activeHeroHighlight = config?.heroHighlight || `District ${activeDistrict}`;
   const activeHeroDescription =
     config?.heroDescription ||
     'Sign in with your personal Gmail account to lodge fiber complaints and track your live resolution status with 100% private cloud protection.';
@@ -277,6 +280,30 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   const activeLicense = config?.licenseNumber || 'Class/Internet/11/2026/Sargodha';
   const activeCoverageHeadline = config?.coverageHeadline || 'District Sargodha, Pakistan only';
   const activeTicketPrefix = config?.ticketPrefix || 'PTA-SGD';
+
+  // Customizable 3-Step Process Section Variables
+  const activeProcessBadge = config?.processBadge || '100% Private & Cloud Protected';
+  const activeProcessTitle =
+    config?.processTitle || `How ${activeDistrict} Customer Complaint Tracking Works`;
+  const activeProcessSubtitle =
+    config?.processSubtitle ||
+    'Every customer has a private account linked to their Gmail. You see only your own complaint status — nothing else.';
+  const activeStep1Title = config?.step1Title || 'Sign In with Your Gmail';
+  const activeStep1Desc =
+    config?.step1Desc ||
+    `Click the top button to sign in with Google or register your Gmail address in ${activeCoverageHeadline}. Your account is strictly private.`;
+  const activeStep1Badge = config?.step1Badge || 'Private Google Cloud Account';
+  const activeStep2Title = config?.step2Title || 'Lodge Fault & Cloud Sync';
+  const activeStep2Desc =
+    config?.step2Desc ||
+    'Submit fiber cut, red LOS light, or slow speed complaints. Every ticket is saved to Google Cloud Firestore under your Gmail.';
+  const activeStep2Badge = config?.step2Badge || `24/7 Helpline: ${activeHelpline}`;
+  const activeStep3Title = config?.step3Title || 'Live Complaint Status';
+  const activeStep3Desc =
+    config?.step3Desc ||
+    `${activeShortName} ${activeDistrict} NOC engineers acknowledge (ACK) your complaint, dispatch field splicers, and update your complaint status live.`;
+  const activeStep3Badge = config?.step3Badge || `Fast ${activeDistrict} Field Dispatch`;
+
   const activePlans =
     config?.bandwidthPlans && config.bandwidthPlans.length > 0
       ? config.bandwidthPlans
@@ -581,7 +608,8 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
               <span>24/7 Helpline: {activeHelpline}</span>
             </a>
-            <div className="flex items-center gap-2">
+            <ThemeSwitcherButton />
+            <div className="hidden md:flex items-center gap-2">
               <CloudCheck className="w-4 h-4 text-emerald-400" />
               <span className="text-xs font-extrabold text-emerald-400">
                 Private Gmail Cloud Portal
@@ -685,7 +713,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   <div>
                     <h3 className="text-sm font-bold text-white">Continue with Google (Gmail)</h3>
                     <p className="text-xs text-slate-400 mt-1">
-                      Sign in securely with your personal Gmail account to view your private complaint status in District Sargodha.
+                      Sign in securely with your personal Gmail account to view your private complaint status in {activeCoverageHeadline}.
                     </p>
                   </div>
                   <button
@@ -789,7 +817,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-700/70 text-emerald-200 text-xs flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>
-                      Google Account Verified (<strong>{pendingGoogleUser.email}</strong>). Complete your Sargodha subscriber details below.
+                      Google Account Verified (<strong>{pendingGoogleUser.email}</strong>). Complete your {activeDistrict} subscriber details below.
                     </span>
                   </div>
                 )}
@@ -877,7 +905,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                       onChange={(e) => setRegDistrict(e.target.value as DistrictName)}
                       className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs focus:outline-none"
                     >
-                      <option value="Sargodha">District Sargodha, Pakistan Only</option>
+                      <option value={activeDistrict}>{activeCoverageHeadline}</option>
                     </select>
                   </div>
                   <div>
@@ -952,12 +980,15 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             className="flex items-center gap-2 text-slate-300 hover:text-white text-xs font-bold transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 text-amber-500" />
-            <span>Back to Citrus Sargodha Homepage</span>
+            <span>Back to {activeShortName} Homepage</span>
           </button>
 
-          <div className="flex items-center gap-2 text-xs font-extrabold text-amber-400 bg-amber-950/60 px-3 py-1 rounded-full border border-amber-800/60">
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-            <span>Internal NOC & Admin Gateway</span>
+          <div className="flex items-center gap-2.5">
+            <ThemeSwitcherButton />
+            <div className="flex items-center gap-2 text-xs font-extrabold text-amber-400 bg-amber-950/60 px-3 py-1 rounded-full border border-amber-800/60">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+              <span>Internal NOC & Admin Gateway</span>
+            </div>
           </div>
         </div>
 
@@ -970,7 +1001,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               </div>
               <div>
                 <h2 className="text-xl font-black text-white">Staff & NOC Operations</h2>
-                <p className="text-xs text-slate-400">Authorized Citrus Sargodha personnel & administrator login</p>
+                <p className="text-xs text-slate-400">Authorized {activeCompanyName} personnel & administrator login</p>
               </div>
             </div>
 
@@ -980,7 +1011,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                 <span>Restricted Internal Gateway</span>
               </div>
               <p className="text-[11px] text-purple-200/90 leading-relaxed">
-                Enter your assigned staff email and password created by the Citrus System Administrator. Unauthorized access is strictly prohibited.
+                Enter your assigned staff email and password created by the {activeShortName} System Administrator. Unauthorized access is strictly prohibited.
               </p>
             </div>
 
@@ -1056,16 +1087,16 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   const currentDiag = activeDiagnostics[activeDiagIndex] || activeDiagnostics[0] || DIAGNOSTIC_PRESETS[0];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-amber-300 selection:text-slate-950">
+    <div className={`min-h-screen flex flex-col justify-between selection:bg-amber-300 selection:text-slate-950 transition-colors duration-200 ${theme.canvasBg} ${theme.textPrimary}`}>
       {/* 1. TOP COLORFUL ANNOUNCEMENT & HELPLINE BAR */}
-      <div className="bg-gradient-to-r from-slate-950 via-emerald-950 to-slate-950 text-white px-4 py-2 border-b border-emerald-500/30">
+      <div className={`bg-gradient-to-r ${theme.heroGradient} text-white px-4 py-2 border-b border-white/15`}>
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] uppercase tracking-wider">
               <Radio className="w-3 h-3 text-slate-950 animate-pulse" />
               {activeCoverageHeadline}
             </span>
-            <span className="text-emerald-200 font-semibold hidden sm:inline">
+            <span className="text-slate-200 font-semibold hidden sm:inline">
               Licensed PTA CVAS ({activeLicense}) Optical Fiber Internet Portal
             </span>
           </div>
@@ -1078,7 +1109,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
               <span>24/7 NOC Helpline: {activeHelpline}</span>
             </a>
-            <span className="text-slate-600 hidden md:inline">|</span>
+            <span className="text-slate-500 hidden md:inline">|</span>
             <a
               href={`mailto:${activeEmail}`}
               className="hidden md:flex items-center gap-1.5 font-mono text-emerald-300 hover:text-white transition-colors"
@@ -1091,7 +1122,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
       </div>
 
       {/* 2. STICKY MAIN HEADER */}
-      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+      <header className={`${theme.headerBg} ${theme.headerBorder} border-b sticky top-0 z-30 shadow-xs transition-colors duration-200`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 gap-4">
             {/* Logo & Company Identity */}
@@ -1103,31 +1134,31 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   className="w-12 h-12 rounded-2xl object-contain bg-white border border-slate-200 p-1 shadow-md"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg ring-2 ring-orange-400/50">
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${theme.brandGradient} flex items-center justify-center font-black text-2xl shadow-lg`}>
                   {activeLogoText}
                 </div>
               )}
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-slate-950 via-slate-800 to-emerald-900 bg-clip-text text-transparent">
+                  <span className={`text-2xl font-black tracking-tight ${theme.isDark ? 'text-white' : 'text-slate-900'}`}>
                     {activeCompanyName}
                   </span>
                 </div>
-                <p className="text-xs text-slate-600 font-semibold">
+                <p className={`text-xs font-semibold ${theme.textSecondary}`}>
                   {activeTagline} · {activeCoverageHeadline}
                 </p>
               </div>
             </div>
 
             {/* Top Right Action Zone */}
-            <div className="flex items-center gap-3">
-              <div className="hidden lg:flex flex-col text-right pr-3 border-r border-slate-200">
-                <span className="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wider">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className={`hidden lg:flex flex-col text-right pr-3 border-r ${theme.isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+                <span className={`text-[10px] font-extrabold uppercase tracking-wider ${theme.accentText}`}>
                   24/7 NOC Helpline & Support
                 </span>
                 <a
                   href={`tel:${activeHelpline}`}
-                  className="font-mono font-black text-sm text-slate-900 hover:text-orange-600 transition-colors"
+                  className={`font-mono font-black text-sm hover:text-orange-500 transition-colors ${theme.isDark ? 'text-white' : 'text-slate-900'}`}
                 >
                   {activeHelpline}
                 </a>
@@ -1138,9 +1169,13 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   const el = document.getElementById('coverage-section');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="hidden md:flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-extrabold text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all cursor-pointer border border-amber-200"
+                className={`hidden md:flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-extrabold rounded-xl transition-all cursor-pointer border ${
+                  theme.isDark
+                    ? 'bg-slate-800 text-amber-300 border-slate-700 hover:bg-slate-700'
+                    : 'text-amber-900 bg-amber-50 hover:bg-amber-100 border-amber-200'
+                }`}
               >
-                <MapPin className="w-3.5 h-3.5 text-orange-600" />
+                <MapPin className="w-3.5 h-3.5 text-orange-500" />
                 <span>Coverage Network</span>
               </button>
 
@@ -1149,16 +1184,23 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   const el = document.getElementById('track-section');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="hidden sm:flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-extrabold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer border border-slate-200"
+                className={`hidden sm:flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-extrabold rounded-xl transition-all cursor-pointer border ${
+                  theme.isDark
+                    ? 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700'
+                    : 'text-slate-700 bg-slate-100 hover:bg-slate-200 border-slate-200'
+                }`}
               >
-                <Search className="w-3.5 h-3.5 text-slate-600" />
+                <Search className="w-3.5 h-3.5" />
                 <span>Track Ticket</span>
               </button>
+
+              {/* THEME ICON SWITCHER BUTTON ON HOME PAGE */}
+              <ThemeSwitcherButton />
 
               {/* PRIMARY PROMINENT TOP BUTTON: Register Complaint Login (Gmail) */}
               <button
                 onClick={() => setPageView('customer_auth')}
-                className="px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.98] transition-all shadow-lg hover:shadow-emerald-500/30 flex items-center gap-2 cursor-pointer ring-2 ring-emerald-400/50"
+                className={`px-4 sm:px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm active:scale-[0.98] transition-all shadow-lg flex items-center gap-2 cursor-pointer ${theme.primaryBtn}`}
               >
                 <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0 shadow-xs">
                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -1180,7 +1222,8 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                     />
                   </svg>
                 </div>
-                <span>Register Complaint / Customer Login</span>
+                <span className="hidden sm:inline">Register Complaint / Customer Login</span>
+                <span className="sm:hidden">Customer Login</span>
                 <ArrowRight className="w-4 h-4 ml-0.5" />
               </button>
             </div>
@@ -1189,10 +1232,10 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
       </header>
 
       {/* 3. VIBRANT HERO SECTION WITH INTERACTIVE SUPPORT & DIAGNOSTIC CARDS */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 text-white py-14 sm:py-20 border-b border-emerald-800/40">
-        {/* Decorative Citrus & Emerald Glow Blobs */}
+      <section className={`relative overflow-hidden bg-gradient-to-br ${theme.heroGradient} text-white py-14 sm:py-20 border-b border-white/15 transition-colors duration-300`}>
+        {/* Decorative Glow Blobs */}
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 right-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 right-0 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 left-1/3 w-80 h-80 bg-amber-400/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -1431,7 +1474,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             {/* Interactive Sector Search Filter */}
             <div className="w-full lg:w-80">
               <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
-                Check Your Sargodha Area / Colony:
+                Check Your {activeDistrict} Area / Colony:
               </label>
               <div className="relative">
                 <input
@@ -1446,7 +1489,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             </div>
           </div>
 
-          {/* Interactive Sargodha Zones Grid + Live Selected Node Inspector */}
+          {/* Interactive Zones Grid + Live Selected Node Inspector */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Clickable Sector Cards (7 cols) */}
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1486,12 +1529,12 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               })}
             </div>
 
-            {/* Interactive Selected Sargodha Node Telemetry Card (5 cols) */}
+            {/* Interactive Selected Node Telemetry Card (5 cols) */}
             <div className="lg:col-span-5 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white rounded-3xl p-6 sm:p-7 shadow-2xl border-2 border-emerald-500/30 space-y-5">
               <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                 <div>
                   <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 block">
-                    Live Sargodha Fiber Node Telemetry
+                    Live {activeShortName} Fiber Node Telemetry
                   </span>
                   <h3 className="text-lg font-black text-white mt-0.5">{selectedZone.name}</h3>
                 </div>
@@ -1522,7 +1565,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   </div>
                   <div className="p-3.5 rounded-2xl bg-amber-950/60 border border-amber-700/50">
                     <span className="text-[10px] uppercase font-bold text-amber-300 block">
-                      Sargodha Core Latency
+                      {activeDistrict} Core Latency
                     </span>
                     <span className="font-mono font-black text-sm text-white mt-0.5 block">
                       {selectedZone.pingMs} (PIE Peering)
@@ -1540,7 +1583,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    setRegAddress(selectedZone.name + ', Sargodha');
+                    setRegAddress(`${selectedZone.name}, ${activeDistrict}`);
                     setCustomerAuthTab('register_gmail');
                     setPageView('customer_auth');
                   }}
@@ -1552,8 +1595,8 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    setLodgeDistrict('Sargodha');
-                    setLodgeDescription(`Area: ${selectedZone.name}, District Sargodha — `);
+                    setLodgeDistrict(activeDistrict);
+                    setLodgeDescription(`Area: ${selectedZone.name}, ${activeDistrict} — `);
                     setShowQuickLodgeModal(true);
                   }}
                   className="py-3 px-4 rounded-xl font-bold text-xs text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all cursor-pointer"
@@ -1566,18 +1609,18 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
         </div>
       </section>
 
-      {/* 5. THREE-STEP COLORFUL PROCESS */}
-      <section className="py-14 bg-white border-b border-slate-200">
+      {/* 5. THREE-STEP COLORFUL PROCESS (100% CUSTOMIZABLE FROM ADMIN CONSOLE) */}
+      <section className={`py-14 border-b transition-colors ${theme.isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-black uppercase tracking-wider">
-              100% Private & Cloud Protected
+              {activeProcessBadge}
             </span>
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-2">
-              How Sargodha Customer Complaint Tracking Works
+            <h3 className={`text-2xl sm:text-3xl font-black tracking-tight mt-2 ${theme.headingText}`}>
+              {activeProcessTitle}
             </h3>
-            <p className="text-sm text-slate-600 mt-2">
-              Every customer has a private account linked to their Gmail. You see only your own complaint status — nothing else.
+            <p className={`text-sm mt-2 ${theme.subText}`}>
+              {activeProcessSubtitle}
             </p>
           </div>
 
@@ -1586,13 +1629,13 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-black text-lg mb-4 shadow-md">
                 1
               </div>
-              <h4 className="text-base font-black text-slate-950 mb-2">Sign In with Your Gmail</h4>
+              <h4 className="text-base font-black text-slate-950 mb-2">{activeStep1Title}</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Click the top button to sign in with Google or register your Gmail address in District Sargodha. Your account is strictly private.
+                {activeStep1Desc}
               </p>
               <div className="mt-4 text-[11px] font-extrabold text-emerald-800 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Private Google Cloud Account</span>
+                <span>{activeStep1Badge}</span>
               </div>
             </div>
 
@@ -1600,13 +1643,13 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-slate-950 flex items-center justify-center font-black text-lg mb-4 shadow-md">
                 2
               </div>
-              <h4 className="text-base font-black text-slate-950 mb-2">Lodge Fault & Cloud Sync</h4>
+              <h4 className="text-base font-black text-slate-950 mb-2">{activeStep2Title}</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Submit fiber cut, red LOS light, or slow speed complaints. Every ticket is saved to Google Cloud Firestore under your Gmail.
+                {activeStep2Desc}
               </p>
               <div className="mt-4 text-[11px] font-extrabold text-orange-800 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-orange-600" />
-                <span>24/7 Helpline: {activeHelpline}</span>
+                <span>{activeStep2Badge}</span>
               </div>
             </div>
 
@@ -1614,13 +1657,13 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-black text-lg mb-4 shadow-md">
                 3
               </div>
-              <h4 className="text-base font-black text-slate-950 mb-2">Live Complaint Status</h4>
+              <h4 className="text-base font-black text-slate-950 mb-2">{activeStep3Title}</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Citrus Sargodha NOC engineers acknowledge (ACK) your complaint, dispatch field splicers, and update your complaint status live.
+                {activeStep3Desc}
               </p>
               <div className="mt-4 text-[11px] font-extrabold text-purple-800 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-purple-600" />
-                <span>Fast Sargodha Field Dispatch</span>
+                <span>{activeStep3Badge}</span>
               </div>
             </div>
           </div>
@@ -1884,7 +1927,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             </div>
             <h3 className="text-xl font-black text-slate-950 mb-1">Express Complaint Registration</h3>
             <p className="text-xs text-slate-500 mb-5">
-              Quickly log a fiber fault in District Sargodha · 24/7 Helpline: {activeHelpline}
+              Quickly log a fiber fault in {activeCoverageHeadline} · 24/7 Helpline: {activeHelpline}
             </p>
 
             {quickLodgeSuccessTicket ? (
@@ -1897,7 +1940,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   Ticket #: {quickLodgeSuccessTicket.ticketNumber}
                 </div>
                 <p className="text-xs text-slate-600">
-                  Citrus Sargodha NOC team has received your complaint. For urgent support call <strong>{activeHelpline}</strong>.
+                  {activeCompanyName} NOC team has received your complaint. For urgent support call <strong>{activeHelpline}</strong>.
                 </p>
                 <button
                   onClick={() => {
@@ -1942,7 +1985,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                       onChange={(e) => setLodgeDistrict(e.target.value as DistrictName)}
                       className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-900"
                     >
-                      <option value="Sargodha">District Sargodha, Pakistan</option>
+                      <option value={activeDistrict}>{activeCoverageHeadline}</option>
                     </select>
                   </div>
                 </div>
@@ -1964,14 +2007,14 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Fault Description & Sargodha Address *
+                    Fault Description & {activeDistrict} Address *
                   </label>
                   <textarea
                     rows={3}
                     required
                     value={lodgeDescription}
                     onChange={(e) => setLodgeDescription(e.target.value)}
-                    placeholder="Describe problem and your street/sector in District Sargodha..."
+                    placeholder={`Describe problem and your street/sector in ${activeCoverageHeadline}...`}
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-amber-500"
                   />
                 </div>

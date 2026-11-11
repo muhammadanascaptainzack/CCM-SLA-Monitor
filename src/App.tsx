@@ -42,8 +42,18 @@ import {
   subscribeToCustomerCloudComplaints,
   signOutFirebaseUser,
 } from './firebase.js';
+import { ThemeProvider, usePortalTheme } from './context/ThemeContext.js';
 
 export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
+function AppContent() {
+  const { theme } = usePortalTheme();
   // Portal session: 'none' (Front two-sided login landing) | 'customer' | 'noc'
   const [portalSession, setPortalSession] = useState<'none' | 'customer' | 'noc'>('none');
   const [activeCustomer, setActiveCustomer] = useState<User | null>(null);
@@ -374,7 +384,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col text-slate-900">
+    <div className={`min-h-screen flex flex-col transition-colors duration-200 ${theme.canvasBg} ${theme.textPrimary}`}>
       {/* Top Bar Contract Header */}
       <Header
         config={config}
@@ -550,18 +560,18 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="no-print bg-white border-t border-slate-200 mt-auto py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <footer className={`no-print border-t mt-auto py-6 transition-colors ${theme.isDark ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-white border-slate-200 text-slate-500'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-extrabold text-slate-900">{config?.licenseeName || 'Citrus Pvt Ltd'}</span>
+            <span className={`font-extrabold ${theme.isDark ? 'text-white' : 'text-slate-900'}`}>{config?.licenseeName || 'Citrus Pvt Ltd'}</span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono font-bold text-indigo-700">{config?.licenseNumber || 'Class/Internet/11/2026/Sargodha'}</span>
+            <span className={`font-mono font-bold ${theme.isDark ? 'text-indigo-400' : 'text-indigo-700'}`}>{config?.licenseNumber || 'Class/Internet/11/2026/Sargodha'}</span>
             <span aria-hidden="true">·</span>
-            <span className="font-bold text-amber-700">{config?.coverageHeadline || 'District Sargodha, Pakistan only'}</span>
+            <span className={`font-bold ${theme.isDark ? 'text-amber-400' : 'text-amber-700'}`}>{config?.coverageHeadline || 'District Sargodha, Pakistan only'}</span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono font-bold text-slate-800">24/7 Helpline: {config?.emergencyNocHelpline || '03390480022'}</span>
+            <span className={`font-mono font-bold ${theme.isDark ? 'text-slate-200' : 'text-slate-800'}`}>24/7 Helpline: {config?.emergencyNocHelpline || '03390480022'}</span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono text-emerald-700">{config?.complianceOfficerEmail || 'support.citrus@gmail.com'}</span>
+            <span className={`font-mono ${theme.isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>{config?.complianceOfficerEmail || 'support.citrus@gmail.com'}</span>
           </div>
           {portalSession !== 'customer' && (
             <div className="flex items-center gap-4">

@@ -157,6 +157,20 @@ export interface PTALicenseeConfig {
   heroHighlight?: string; // e.g. "District Sargodha"
   heroDescription?: string; // Welcome subtitle on landing page
 
+  // Public 3-Step Process Section ("How Customer Complaint Tracking Works") Customization
+  processBadge?: string; // e.g. "100% Private & Cloud Protected"
+  processTitle?: string; // e.g. "How Sargodha Customer Complaint Tracking Works"
+  processSubtitle?: string; // e.g. "Every customer has a private account linked to their Gmail..."
+  step1Title?: string; // e.g. "Sign In with Your Gmail"
+  step1Desc?: string;
+  step1Badge?: string; // e.g. "Private Google Cloud Account"
+  step2Title?: string; // e.g. "Lodge Fault & Cloud Sync"
+  step2Desc?: string;
+  step2Badge?: string; // e.g. "24/7 Helpline: 03390480022"
+  step3Title?: string; // e.g. "Live Complaint Status"
+  step3Desc?: string;
+  step3Badge?: string; // e.g. "Fast Sargodha Field Dispatch"
+
   // Regulatory & Contact Details
   licenseNumber: string; // e.g. Class/Internet/11/2026/Sargodha
   licenseType: string; // District CVAS (Data & Class Value Added Services)
