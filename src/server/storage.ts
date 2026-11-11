@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import {
   ComplaintTicket,
   User,
@@ -613,8 +614,67 @@ const INITIAL_TICKETS: ComplaintTicket[] = [
 class StorageManager {
   private data: DatabaseSchema;
 
+  // O(1) In-Memory Secondary Indexes for 1,000+ Concurrent Users
+  private usersById = new Map<string, User>();
+  private usersByEmail = new Map<string, User>();
+  private usersByCircuitId = new Map<string, User>();
+  private ticketsById = new Map<string, ComplaintTicket>();
+  private ticketsByNumber = new Map<string, ComplaintTicket>();
+  private ticketsByCustomerId = new Map<string, ComplaintTicket[]>();
+
+  // Idempotency & Deduplication Registry (prevents duplicate complaint submissions)
+  private idempotencyRegistry = new Map<string, { ticketId: string; expiresAt: number }>();
+
+  // Monotonic sequence counters to prevent millisecond collisions under high concurrency
+  private ticketSequence = 0;
+  private userSequence = 0;
+
+  // Non-blocking Async Write-Behind Queue state
+  private writeTimer: NodeJS.Timeout | null = null;
+  private isWriting = false;
+  private pendingWrite = false;
+  private asyncWritesCount = 0;
+  private lastWriteDurationMs = 0;
+
   constructor() {
     this.data = this.loadDatabase();
+    this.rebuildIndexes();
+  }
+
+  private rebuildIndexes(): void {
+    this.usersById.clear();
+    this.usersByEmail.clear();
+    this.usersByCircuitId.clear();
+    this.ticketsById.clear();
+    this.ticketsByNumber.clear();
+    this.ticketsByCustomerId.clear();
+
+    for (const u of this.data.users) {
+      this.usersById.set(u.id, u);
+      if (u.email) this.usersByEmail.set(u.email.toLowerCase(), u);
+      if (u.circuitId) this.usersByCircuitId.set(u.circuitId.toUpperCase(), u);
+    }
+
+    for (const t of this.data.tickets) {
+      this.ticketsById.set(t.id, t);
+      this.ticketsByNumber.set(t.ticketNumber.toUpperCase(), t);
+      const list = this.ticketsByCustomerId.get(t.customerId) || [];
+      list.push(t);
+      this.ticketsByCustomerId.set(t.customerId, list);
+    }
+    this.ticketSequence = this.data.tickets.length;
+    this.userSequence = this.data.users.length;
+  }
+
+  public getStorageDiagnostics() {
+    return {
+      indexedUsers: this.usersById.size,
+      indexedTickets: this.ticketsById.size,
+      activeIdempotencyKeys: this.idempotencyRegistry.size,
+      asyncWritesCount: this.asyncWritesCount,
+      lastWriteDurationMs: this.lastWriteDurationMs,
+      pendingWrite: this.pendingWrite || this.isWriting,
+    };
   }
 
   private loadDatabase(): DatabaseSchema {
@@ -739,18 +799,68 @@ class StorageManager {
       tickets: INITIAL_TICKETS
     };
 
-    this.saveDatabase(initialData);
+    this.saveDatabaseSync(initialData);
     return initialData;
   }
 
-  private saveDatabase(dataToSave: DatabaseSchema = this.data): void {
+  /**
+   * Synchronous write used ONLY during initial boot or process SIGINT/SIGTERM shutdown.
+   */
+  public saveDatabaseSync(dataToSave: DatabaseSchema = this.data): void {
     try {
       if (!fs.existsSync(DATA_DIR)) {
         fs.mkdirSync(DATA_DIR, { recursive: true });
       }
-      fs.writeFileSync(DB_FILE, JSON.stringify(dataToSave, null, 2), 'utf-8');
+      const tmpFile = `${DB_FILE}.tmp`;
+      fs.writeFileSync(tmpFile, JSON.stringify(dataToSave, null, 2), 'utf-8');
+      fs.renameSync(tmpFile, DB_FILE);
     } catch (err) {
-      console.error('Failed to persist database to disk:', err);
+      console.error('Failed to persist database synchronously to disk:', err);
+    }
+  }
+
+  /**
+   * Non-blocking, debounced atomic write-behind queue.
+   * Coalesces high-concurrency bursts (e.g., 1,000 simultaneous requests) into background
+   * atomic file swaps without blocking the Node.js event loop.
+   */
+  private saveDatabase(dataToSave?: DatabaseSchema): void {
+    if (dataToSave && dataToSave !== this.data) {
+      this.saveDatabaseSync(dataToSave);
+      return;
+    }
+    this.pendingWrite = true;
+    if (this.writeTimer) return;
+
+    this.writeTimer = setTimeout(() => {
+      this.writeTimer = null;
+      void this.flushAsync();
+    }, 150);
+  }
+
+  private async flushAsync(): Promise<void> {
+    if (this.isWriting || !this.pendingWrite) return;
+    this.isWriting = true;
+    this.pendingWrite = false;
+    const startMs = Date.now();
+
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        await fs.promises.mkdir(DATA_DIR, { recursive: true });
+      }
+      const tmpFile = `${DB_FILE}.${process.pid}.tmp`;
+      const payload = JSON.stringify(this.data);
+      await fs.promises.writeFile(tmpFile, payload, 'utf-8');
+      await fs.promises.rename(tmpFile, DB_FILE);
+      this.asyncWritesCount++;
+      this.lastWriteDurationMs = Date.now() - startMs;
+    } catch (err) {
+      console.error('Failed to persist database asynchronously:', err);
+    } finally {
+      this.isWriting = false;
+      if (this.pendingWrite) {
+        this.saveDatabase();
+      }
     }
   }
 
@@ -772,30 +882,35 @@ class StorageManager {
     return this.data.config;
   }
 
-  // User operations
+  // User operations (O(1) Indexed Lookups)
   public getUsers(): User[] {
     return this.data.users;
   }
 
   public getUserById(id: string): User | undefined {
-    return this.data.users.find(u => u.id === id);
+    return this.usersById.get(id);
   }
 
   public getUserByEmail(email: string): User | undefined {
-    return this.data.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    return this.usersByEmail.get(email.toLowerCase());
   }
 
   public getUserByCircuitId(circuitId: string): User | undefined {
-    return this.data.users.find(u => u.circuitId?.toUpperCase() === circuitId.toUpperCase());
+    return this.usersByCircuitId.get(circuitId.toUpperCase());
   }
 
   public createUser(userData: Omit<User, 'id' | 'createdAt'>): User {
+    this.userSequence++;
+    const randHex = crypto.randomBytes(3).toString('hex');
     const newUser: User = {
       ...userData,
-      id: `usr-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      id: `usr-${Date.now()}-${this.userSequence}-${randHex}`,
       createdAt: new Date().toISOString()
     };
     this.data.users.push(newUser);
+    this.usersById.set(newUser.id, newUser);
+    if (newUser.email) this.usersByEmail.set(newUser.email.toLowerCase(), newUser);
+    if (newUser.circuitId) this.usersByCircuitId.set(newUser.circuitId.toUpperCase(), newUser);
     this.saveDatabase();
     return newUser;
   }
@@ -803,12 +918,23 @@ class StorageManager {
   public updateUser(id: string, updates: Partial<User>): User {
     const user = this.getUserById(id);
     if (!user) throw new Error(`User with ID ${id} not found`);
+    if (user.email) this.usersByEmail.delete(user.email.toLowerCase());
+    if (user.circuitId) this.usersByCircuitId.delete(user.circuitId.toUpperCase());
     Object.assign(user, updates);
+    this.usersById.set(user.id, user);
+    if (user.email) this.usersByEmail.set(user.email.toLowerCase(), user);
+    if (user.circuitId) this.usersByCircuitId.set(user.circuitId.toUpperCase(), user);
     this.saveDatabase();
     return user;
   }
 
   public deleteUser(id: string): void {
+    const user = this.usersById.get(id);
+    if (user) {
+      this.usersById.delete(id);
+      if (user.email) this.usersByEmail.delete(user.email.toLowerCase());
+      if (user.circuitId) this.usersByCircuitId.delete(user.circuitId.toUpperCase());
+    }
     const idx = this.data.users.findIndex(u => u.id === id);
     if (idx !== -1) {
       this.data.users.splice(idx, 1);
@@ -816,17 +942,21 @@ class StorageManager {
     }
   }
 
-  // Ticket operations
+  // Ticket operations (O(1) Indexed Lookups)
   public getTickets(): ComplaintTicket[] {
     return this.data.tickets;
   }
 
+  public getTicketsByCustomerId(customerId: string): ComplaintTicket[] {
+    return this.ticketsByCustomerId.get(customerId) || [];
+  }
+
   public getTicketById(id: string): ComplaintTicket | undefined {
-    return this.data.tickets.find(t => t.id === id);
+    return this.ticketsById.get(id);
   }
 
   public getTicketByNumber(ticketNumber: string): ComplaintTicket | undefined {
-    return this.data.tickets.find(t => t.ticketNumber.toUpperCase() === ticketNumber.toUpperCase());
+    return this.ticketsByNumber.get(ticketNumber.toUpperCase());
   }
 
   public calculateSlaDeadline(priority: ComplaintPriority, fromDate: Date = new Date()): Date {
@@ -854,21 +984,47 @@ class StorageManager {
     opticalPowerRx?: string;
     pingLatencyMs?: number;
     packetLossPercent?: number;
-  }): ComplaintTicket {
+    idempotencyKey?: string;
+  }): { ticket: ComplaintTicket; deduplicated: boolean } {
     const customer = this.getUserById(input.customerId);
     if (!customer) {
       throw new Error(`Customer with ID ${input.customerId} not found`);
     }
 
-    const now = new Date();
+    const nowMs = Date.now();
+    // Clean expired idempotency entries periodically
+    if (this.idempotencyRegistry.size > 2000) {
+      for (const [k, v] of this.idempotencyRegistry.entries()) {
+        if (v.expiresAt < nowMs) this.idempotencyRegistry.delete(k);
+      }
+    }
+
+    // Compute idempotency fingerprint (explicit key OR 15-second duplicate content guard)
+    const contentFingerprint = crypto
+      .createHash('sha256')
+      .update(`${input.customerId}|${input.category}|${input.subject.trim().toLowerCase()}|${input.description.trim().toLowerCase()}`)
+      .digest('hex');
+    const dedupKey = input.idempotencyKey ? `key:${input.idempotencyKey}` : `fp:${contentFingerprint}`;
+
+    const existingEntry = this.idempotencyRegistry.get(dedupKey);
+    if (existingEntry && existingEntry.expiresAt > nowMs) {
+      const existingTicket = this.getTicketById(existingEntry.ticketId);
+      if (existingTicket) {
+        return { ticket: existingTicket, deduplicated: true };
+      }
+    }
+
+    const now = new Date(nowMs);
     const slaDeadline = this.calculateSlaDeadline(input.priority, now);
     const district = customer.district || this.data.config.registeredDistrict || 'Sargodha';
 
-    // Generate official ticket number using custom ticketPrefix or PTA-DIS
-    const ticketSeq = (this.data.tickets.length + 1).toString().padStart(4, '0');
+    // Collision-free monotonic sequence + random suffix
+    this.ticketSequence++;
+    const ticketSeq = this.ticketSequence.toString().padStart(4, '0');
     const districtCode = district.substring(0, 3).toUpperCase();
     const prefix = (this.data.config.ticketPrefix || `PTA-${districtCode}`).trim().toUpperCase();
-    const ticketNumber = `${prefix}-${now.getFullYear()}-${ticketSeq}`;
+    const randSuffix = crypto.randomBytes(2).toString('hex').toUpperCase();
+    const ticketNumber = `${prefix}-${now.getFullYear()}-${ticketSeq}-${randSuffix}`;
 
     const cktPrefix = (this.data.config.circuitPrefix || `PK-${districtCode}`).trim().toUpperCase();
     const p1Hrs = this.data.config.slaTargetP1Hours || 8;
@@ -876,7 +1032,7 @@ class StorageManager {
     const p3Hrs = this.data.config.slaTargetP3Hours || 48;
 
     const newTicket: ComplaintTicket = {
-      id: `tkt-${Date.now()}`,
+      id: `tkt-${nowMs}-${this.ticketSequence}-${crypto.randomBytes(2).toString('hex')}`,
       ticketNumber,
       customerId: customer.id,
       customerName: customer.name,
@@ -900,7 +1056,7 @@ class StorageManager {
       isSlaBreached: false,
       timeline: [
         {
-          id: `tl-${Date.now()}-1`,
+          id: `tl-${nowMs}-${this.ticketSequence}`,
           timestamp: now.toISOString(),
           action: 'Complaint Registered in CMS',
           performedBy: customer.name,
@@ -911,8 +1067,18 @@ class StorageManager {
     };
 
     this.data.tickets.unshift(newTicket);
+    this.ticketsById.set(newTicket.id, newTicket);
+    this.ticketsByNumber.set(newTicket.ticketNumber.toUpperCase(), newTicket);
+    const custList = this.ticketsByCustomerId.get(customer.id) || [];
+    custList.unshift(newTicket);
+    this.ticketsByCustomerId.set(customer.id, custList);
+
+    // Record idempotency lock (60s for explicit key, 15s for identical content double-submit)
+    const ttlMs = input.idempotencyKey ? 60_000 : 15_000;
+    this.idempotencyRegistry.set(dedupKey, { ticketId: newTicket.id, expiresAt: nowMs + ttlMs });
+
     this.saveDatabase();
-    return newTicket;
+    return { ticket: newTicket, deduplicated: false };
   }
 
   public updateTicketStatus(
@@ -1076,12 +1242,15 @@ class StorageManager {
 
   public resetToSampleData(): void {
     this.data = {
-      config: INITIAL_CONFIG,
-      users: INITIAL_USERS,
-      tickets: INITIAL_TICKETS
+      config: JSON.parse(JSON.stringify(INITIAL_CONFIG)),
+      users: JSON.parse(JSON.stringify(INITIAL_USERS)),
+      tickets: JSON.parse(JSON.stringify(INITIAL_TICKETS))
     };
+    this.idempotencyRegistry.clear();
+    this.rebuildIndexes();
     this.saveDatabase();
   }
 }
 
 export const storage = new StorageManager();
+

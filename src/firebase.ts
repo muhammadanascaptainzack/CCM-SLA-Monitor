@@ -128,7 +128,7 @@ export async function getCloudCustomerProfile(uid: string): Promise<UserType | n
       phone: data.phone,
       cnic: data.cnic,
       role: 'customer',
-      district: (data.district as DistrictName) || 'Faisalabad',
+      district: (data.district as DistrictName) || 'Sargodha',
       areaAddress: data.areaAddress,
       circuitId: data.circuitId,
       bandwidthPlan: data.bandwidthPlan,
@@ -143,10 +143,10 @@ export async function getCloudCustomerProfile(uid: string): Promise<UserType | n
 export async function saveCloudCustomerProfile(uid: string, user: UserType): Promise<void> {
   if (!auth.currentUser || auth.currentUser.uid !== uid) return;
   const path = `users/${uid}`;
-  const validDistricts: DistrictName[] = ['Faisalabad', 'Lahore', 'Multan', 'Rawalpindi', 'Islamabad'];
+  const validDistricts: DistrictName[] = ['Sargodha', 'Faisalabad', 'Lahore', 'Multan', 'Rawalpindi', 'Islamabad'];
   const district: DistrictName = validDistricts.includes(user.district as DistrictName)
     ? (user.district as DistrictName)
-    : 'Faisalabad';
+    : 'Sargodha';
   const validConn = ['FTTH', 'GPON', 'Wireless P2P', 'Copper DSL'];
   const connectionType = validConn.includes(user.connectionType || '') ? user.connectionType! : 'FTTH';
 
@@ -189,10 +189,10 @@ export async function saveCloudComplaint(uid: string, ticket: ComplaintTicket, c
   if (!auth.currentUser || auth.currentUser.uid !== uid) return;
   const cleanTicketId = sanitizeId(ticket.id);
   const path = `complaints/${cleanTicketId}`;
-  const validDistricts: DistrictName[] = ['Faisalabad', 'Lahore', 'Multan', 'Rawalpindi', 'Islamabad'];
+  const validDistricts: DistrictName[] = ['Sargodha', 'Faisalabad', 'Lahore', 'Multan', 'Rawalpindi', 'Islamabad'];
   const district: DistrictName = validDistricts.includes(ticket.district as DistrictName)
     ? (ticket.district as DistrictName)
-    : 'Faisalabad';
+    : 'Sargodha';
 
   try {
     const existingSnap = await getDoc(doc(db, 'complaints', cleanTicketId));

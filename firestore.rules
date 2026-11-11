@@ -68,7 +68,7 @@ service cloud.firestore {
         data.phone is string && data.phone.size() >= 5 && data.phone.size() <= 30 &&
         data.cnic is string && data.cnic.size() >= 5 && data.cnic.size() <= 25 &&
         data.district is string && data.district.size() >= 2 && data.district.size() <= 40 &&
-        data.district in ['Faisalabad', 'Lahore', 'Multan', 'Rawalpindi', 'Islamabad'] &&
+        data.district in ['Sargodha', 'Faisalabad', 'Lahore', 'Multan', 'Rawalpindi', 'Islamabad'] &&
         data.areaAddress is string && data.areaAddress.size() >= 2 && data.areaAddress.size() <= 250 &&
         data.circuitId is string && data.circuitId.size() >= 2 && data.circuitId.size() <= 64 &&
         data.bandwidthPlan is string && data.bandwidthPlan.size() >= 2 && data.bandwidthPlan.size() <= 100 &&
@@ -102,7 +102,7 @@ service cloud.firestore {
         data.customerPhone is string && data.customerPhone.size() >= 5 && data.customerPhone.size() <= 30 &&
         data.circuitId is string && data.circuitId.size() >= 2 && data.circuitId.size() <= 64 &&
         data.district is string && data.district.size() >= 2 && data.district.size() <= 40 &&
-        data.district in ['Faisalabad', 'Lahore', 'Multan', 'Rawalpindi', 'Islamabad'] &&
+        data.district in ['Sargodha', 'Faisalabad', 'Lahore', 'Multan', 'Rawalpindi', 'Islamabad'] &&
         data.category is string && data.category.size() >= 2 && data.category.size() <= 50 &&
         data.category in [
           'OFC_CUT', 'SPEED_DEGRADATION', 'FREQUENT_DISCONNECT',

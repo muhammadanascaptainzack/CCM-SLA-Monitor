@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { apiRouter } from './src/server/api.js';
+import { storage } from './src/server/storage.js';
 
 dotenv.config();
 
@@ -12,7 +13,19 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
 
-// Body parsers (10mb limit to support admin logo image uploads)
+// Disable X-Powered-By header to prevent server fingerprinting (OWASP)
+app.disable('x-powered-by');
+
+// Apply OWASP Security Headers
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-XSS-Protection', '0');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
+// Body parsers (10mb limit to support admin logo image & 5MB complaint screenshot uploads)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -35,9 +48,9 @@ async function startServer() {
 
     app.use(vite.middlewares);
   } else {
-    // In production mode, serve built static files from dist
+    // In production mode, serve built static files from dist with caching headers
     const distPath = path.resolve(__dirname, 'dist');
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, { maxAge: '1h' }));
     app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
@@ -57,6 +70,8 @@ async function startServer() {
       const s = app.listen(port, '0.0.0.0', () => {
         console.log(`[Citrus CMS] Server listening on port ${port} at http://0.0.0.0:${port}`);
       });
+      s.keepAliveTimeout = 65_000;
+      s.headersTimeout = 66_000;
       s.on('error', (err: any) => {
         if (err.code === 'EADDRINUSE') {
           console.warn(`[Citrus CMS] Port ${port} already in use on host, continuing.`);
@@ -69,6 +84,15 @@ async function startServer() {
     }
   }
 }
+
+// Graceful shutdown hook to ensure pending write-behind database changes are flushed atomically
+function gracefulShutdown(signal: string) {
+  console.log(`[Citrus CMS] Received ${signal}, flushing database to disk...`);
+  storage.saveDatabaseSync();
+  process.exit(0);
+}
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
 startServer().catch(err => {
   console.error('[Citrus CMS Server] Failed to start:', err);

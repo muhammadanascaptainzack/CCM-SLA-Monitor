@@ -1,0 +1,605 @@
+{
+  "loadStages": [
+    {
+      "virtualUsers": 100,
+      "totalRequests": 400,
+      "elapsedSec": 0.32,
+      "rps": 1241.5,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 352,
+        "201": 48
+      },
+      "avg": 31.26,
+      "p50": 9.88,
+      "p90": 170.96,
+      "p95": 179.14,
+      "p99": 185.1,
+      "max": 187.39,
+      "cpuPercent": 92.2,
+      "serverRssMb": 296.3,
+      "throughputMbps": 50.23
+    },
+    {
+      "virtualUsers": 250,
+      "totalRequests": 1000,
+      "elapsedSec": 0.7,
+      "rps": 1425.9,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 876,
+        "201": 124
+      },
+      "avg": 75.6,
+      "p50": 18.36,
+      "p90": 314.15,
+      "p95": 396.44,
+      "p99": 493.57,
+      "max": 515.95,
+      "cpuPercent": 81.4,
+      "serverRssMb": 296.8,
+      "throughputMbps": 163.32
+    },
+    {
+      "virtualUsers": 500,
+      "totalRequests": 2000,
+      "elapsedSec": 1.29,
+      "rps": 1545.3,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 1752,
+        "201": 248
+      },
+      "avg": 160.69,
+      "p50": 75.93,
+      "p90": 636.74,
+      "p95": 848.31,
+      "p99": 1012.5,
+      "max": 1031.83,
+      "cpuPercent": 83.7,
+      "serverRssMb": 297.1,
+      "throughputMbps": 224.79
+    },
+    {
+      "virtualUsers": 750,
+      "totalRequests": 2250,
+      "elapsedSec": 1.32,
+      "rps": 1706.1,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 1970,
+        "201": 280
+      },
+      "avg": 241.37,
+      "p50": 195.75,
+      "p90": 795.18,
+      "p95": 947.17,
+      "p99": 1077.56,
+      "max": 1098.54,
+      "cpuPercent": 74.2,
+      "serverRssMb": 301.5,
+      "throughputMbps": 248.57
+    },
+    {
+      "virtualUsers": 1000,
+      "totalRequests": 3000,
+      "elapsedSec": 1.72,
+      "rps": 1741.9,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 2625,
+        "201": 375
+      },
+      "avg": 284.31,
+      "p50": 199.73,
+      "p90": 1002.81,
+      "p95": 1265.51,
+      "p99": 1410.45,
+      "max": 1462.16,
+      "cpuPercent": 76,
+      "serverRssMb": 307.5,
+      "throughputMbps": 253.72
+    },
+    {
+      "virtualUsers": 1250,
+      "totalRequests": 2500,
+      "elapsedSec": 1.52,
+      "rps": 1640.5,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 2188,
+        "201": 312
+      },
+      "avg": 336.08,
+      "p50": 163.83,
+      "p90": 959.35,
+      "p95": 1078.87,
+      "p99": 1196.75,
+      "max": 1225.16,
+      "cpuPercent": 73.7,
+      "serverRssMb": 309.8,
+      "throughputMbps": 239.15
+    },
+    {
+      "virtualUsers": 1500,
+      "totalRequests": 3000,
+      "elapsedSec": 1.88,
+      "rps": 1595.9,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 2626,
+        "201": 374
+      },
+      "avg": 398.34,
+      "p50": 195.03,
+      "p90": 1172.6,
+      "p95": 1341.83,
+      "p99": 1486.67,
+      "max": 1513.88,
+      "cpuPercent": 72.9,
+      "serverRssMb": 308.3,
+      "throughputMbps": 232.65
+    },
+    {
+      "virtualUsers": 2000,
+      "totalRequests": 4000,
+      "elapsedSec": 3.77,
+      "rps": 1061.6,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 3500,
+        "201": 500
+      },
+      "avg": 693.51,
+      "p50": 168.32,
+      "p90": 1667.8,
+      "p95": 3210.51,
+      "p99": 3331.15,
+      "max": 3343.33,
+      "cpuPercent": 46.2,
+      "serverRssMb": 305.2,
+      "throughputMbps": 155.05
+    }
+  ],
+  "postStressRecovery": {
+    "virtualUsers": 100,
+    "totalRequests": 400,
+    "elapsedSec": 0.21,
+    "rps": 1914.4,
+    "failedRequests": 0,
+    "errorRatePercent": 0,
+    "statusCodes": {
+      "200": 352,
+      "201": 48
+    },
+    "avg": 12.17,
+    "p50": 11.29,
+    "p90": 23.93,
+    "p95": 29.19,
+    "p99": 32.44,
+    "max": 43.98,
+    "cpuPercent": 54.8,
+    "serverRssMb": 313.3,
+    "throughputMbps": 279.17
+  },
+  "spikeTests": {
+    "scenarioA_100to1000": {
+      "virtualUsers": 1000,
+      "totalRequests": 2000,
+      "elapsedSec": 1.19,
+      "rps": 1673.9,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 1750,
+        "201": 250
+      },
+      "avg": 269.4,
+      "p50": 225.65,
+      "p90": 788.11,
+      "p95": 880.47,
+      "p99": 997.46,
+      "max": 1018.88,
+      "cpuPercent": 68.8,
+      "serverRssMb": 317.8,
+      "throughputMbps": 244.28
+    },
+    "scenarioB_1000to1500": {
+      "virtualUsers": 1500,
+      "totalRequests": 3000,
+      "elapsedSec": 1.86,
+      "rps": 1609.9,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 2626,
+        "201": 374
+      },
+      "avg": 398.95,
+      "p50": 148.48,
+      "p90": 1203.55,
+      "p95": 1393.42,
+      "p99": 1530.96,
+      "max": 1574.76,
+      "cpuPercent": 69.4,
+      "serverRssMb": 323.2,
+      "throughputMbps": 234.67
+    },
+    "scenarioC_1500to100": {
+      "virtualUsers": 100,
+      "totalRequests": 400,
+      "elapsedSec": 0.21,
+      "rps": 1901.3,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "statusCodes": {
+        "200": 352,
+        "201": 48
+      },
+      "avg": 10.17,
+      "p50": 8.45,
+      "p90": 20.15,
+      "p95": 34.36,
+      "p99": 35.27,
+      "max": 48.5,
+      "cpuPercent": 69,
+      "serverRssMb": 323.3,
+      "throughputMbps": 277.22
+    }
+  },
+  "radiusTests": {
+    "normal": {
+      "status": 200,
+      "durationMs": 14.11,
+      "body": {
+        "record": {
+          "subscriberId": "usr-1",
+          "username": "usman.khan",
+          "circuitId": "PK-SGD-0194",
+          "fullName": "Muhammad Usman Khan",
+          "phone": "0300-8654321",
+          "district": "Sargodha",
+          "packagePlan": "50 Mbps Fiber Unlimited",
+          "connectionStatus": "LOS_ALARM",
+          "pppoeIpAddress": "103.151.123.105",
+          "onuMacAddress": "48:57:02:A1:BF:AA",
+          "opticalRxDbm": "-38.4 dBm (LOS)",
+          "uptimeFormatted": "0m (Link Down)",
+          "currentBalancePkr": 2000,
+          "billingCycleDue": "25th of Current Month",
+          "monthlyDownloadGb": 720,
+          "lastSyncedAt": "2026-11-11T15:22:52.395Z",
+          "source": "ZALPRO_LIVE"
+        },
+        "degraded": false,
+        "latencyMs": 13,
+        "circuitState": "CLOSED"
+      }
+    },
+    "delay1s": {
+      "status": 200,
+      "durationMs": 1002.84,
+      "degraded": false
+    },
+    "delay3s_timeoutCut": {
+      "status": 200,
+      "durationMs": 2502.11,
+      "body": {
+        "record": {
+          "subscriberId": "usr-1",
+          "username": "usman.khan",
+          "circuitId": "PK-SGD-0194",
+          "fullName": "Muhammad Usman Khan",
+          "phone": "0300-8654321",
+          "district": "Sargodha",
+          "packagePlan": "50 Mbps Fiber Unlimited",
+          "connectionStatus": "LOS_ALARM",
+          "pppoeIpAddress": "103.151.123.105",
+          "onuMacAddress": "48:57:02:A1:BF:AA",
+          "opticalRxDbm": "-38.4 dBm (LOS)",
+          "uptimeFormatted": "0m (Link Down)",
+          "currentBalancePkr": 2000,
+          "billingCycleDue": "25th of Current Month",
+          "monthlyDownloadGb": 720,
+          "lastSyncedAt": "2026-11-11T15:22:53.398Z",
+          "source": "STALE_CACHE_FALLBACK"
+        },
+        "degraded": true,
+        "warning": "ZalPro RADIUS upstream unavailable (Upstream ZalPro API read timeout exceeded (2500ms)) — graceful fallback active.",
+        "latencyMs": 2500,
+        "circuitState": "CLOSED"
+      }
+    },
+    "delay5s_timeoutCut": {
+      "status": 200,
+      "durationMs": 2501.88,
+      "body": {
+        "record": {
+          "subscriberId": "usr-1",
+          "username": "usman.khan",
+          "circuitId": "PK-SGD-0194",
+          "fullName": "Muhammad Usman Khan",
+          "phone": "0300-8654321",
+          "district": "Sargodha",
+          "packagePlan": "50 Mbps Fiber Unlimited",
+          "connectionStatus": "LOS_ALARM",
+          "pppoeIpAddress": "103.151.123.105",
+          "onuMacAddress": "48:57:02:A1:BF:AA",
+          "opticalRxDbm": "-38.4 dBm (LOS)",
+          "uptimeFormatted": "0m (Link Down)",
+          "currentBalancePkr": 2000,
+          "billingCycleDue": "25th of Current Month",
+          "monthlyDownloadGb": 720,
+          "lastSyncedAt": "2026-11-11T15:22:53.398Z",
+          "source": "STALE_CACHE_FALLBACK"
+        },
+        "degraded": true,
+        "warning": "ZalPro RADIUS upstream unavailable (Upstream ZalPro API read timeout exceeded (2500ms)) — graceful fallback active.",
+        "latencyMs": 2500,
+        "circuitState": "CLOSED"
+      }
+    },
+    "delay10s_timeoutCut": {
+      "status": 200,
+      "durationMs": 2502.06,
+      "body": {
+        "record": {
+          "subscriberId": "usr-1",
+          "username": "usman.khan",
+          "circuitId": "PK-SGD-0194",
+          "fullName": "Muhammad Usman Khan",
+          "phone": "0300-8654321",
+          "district": "Sargodha",
+          "packagePlan": "50 Mbps Fiber Unlimited",
+          "connectionStatus": "LOS_ALARM",
+          "pppoeIpAddress": "103.151.123.105",
+          "onuMacAddress": "48:57:02:A1:BF:AA",
+          "opticalRxDbm": "-38.4 dBm (LOS)",
+          "uptimeFormatted": "0m (Link Down)",
+          "currentBalancePkr": 2000,
+          "billingCycleDue": "25th of Current Month",
+          "monthlyDownloadGb": 720,
+          "lastSyncedAt": "2026-11-11T15:22:53.398Z",
+          "source": "STALE_CACHE_FALLBACK"
+        },
+        "degraded": true,
+        "warning": "ZalPro RADIUS upstream unavailable (Upstream ZalPro API read timeout exceeded (2500ms)) — graceful fallback active.",
+        "latencyMs": 2500,
+        "circuitState": "CLOSED"
+      }
+    },
+    "auth401Fallback": {
+      "status": 200,
+      "durationMs": 14.37,
+      "body": {
+        "record": {
+          "subscriberId": "usr-1",
+          "username": "usman.khan",
+          "circuitId": "PK-SGD-0194",
+          "fullName": "Muhammad Usman Khan",
+          "phone": "0300-8654321",
+          "district": "Sargodha",
+          "packagePlan": "50 Mbps Fiber Unlimited",
+          "connectionStatus": "LOS_ALARM",
+          "pppoeIpAddress": "103.151.123.105",
+          "onuMacAddress": "48:57:02:A1:BF:AA",
+          "opticalRxDbm": "-38.4 dBm (LOS)",
+          "uptimeFormatted": "0m (Link Down)",
+          "currentBalancePkr": 2000,
+          "billingCycleDue": "25th of Current Month",
+          "monthlyDownloadGb": 720,
+          "lastSyncedAt": "2026-11-11T15:22:53.398Z",
+          "source": "STALE_CACHE_FALLBACK"
+        },
+        "degraded": true,
+        "warning": "ZalPro RADIUS upstream unavailable (ZalPro API authentication failed (HTTP 401 Unauthorized)) — graceful fallback active.",
+        "latencyMs": 13,
+        "circuitState": "CLOSED"
+      }
+    },
+    "rate429Fallback": {
+      "status": 200,
+      "durationMs": 13.51,
+      "body": {
+        "record": {
+          "subscriberId": "usr-1",
+          "username": "usman.khan",
+          "circuitId": "PK-SGD-0194",
+          "fullName": "Muhammad Usman Khan",
+          "phone": "0300-8654321",
+          "district": "Sargodha",
+          "packagePlan": "50 Mbps Fiber Unlimited",
+          "connectionStatus": "LOS_ALARM",
+          "pppoeIpAddress": "103.151.123.105",
+          "onuMacAddress": "48:57:02:A1:BF:AA",
+          "opticalRxDbm": "-38.4 dBm (LOS)",
+          "uptimeFormatted": "0m (Link Down)",
+          "currentBalancePkr": 2000,
+          "billingCycleDue": "25th of Current Month",
+          "monthlyDownloadGb": 720,
+          "lastSyncedAt": "2026-11-11T15:22:53.398Z",
+          "source": "STALE_CACHE_FALLBACK"
+        },
+        "degraded": true,
+        "warning": "ZalPro RADIUS upstream unavailable (ZalPro API rate limit exceeded (HTTP 429 Too Many Requests)) — graceful fallback active.",
+        "latencyMs": 13,
+        "circuitState": "OPEN"
+      }
+    },
+    "invalidJsonFallback": {
+      "status": 200,
+      "durationMs": 1.32,
+      "body": {
+        "record": {
+          "subscriberId": "usr-1",
+          "username": "usman.khan",
+          "circuitId": "PK-SGD-0194",
+          "fullName": "Muhammad Usman Khan",
+          "phone": "0300-8654321",
+          "district": "Sargodha",
+          "packagePlan": "50 Mbps Fiber Unlimited",
+          "connectionStatus": "LOS_ALARM",
+          "pppoeIpAddress": "103.151.123.105",
+          "onuMacAddress": "48:57:02:A1:BF:AA",
+          "opticalRxDbm": "-38.4 dBm (LOS)",
+          "uptimeFormatted": "0m (Link Down)",
+          "currentBalancePkr": 2000,
+          "billingCycleDue": "25th of Current Month",
+          "monthlyDownloadGb": 720,
+          "lastSyncedAt": "2026-11-11T15:22:53.398Z",
+          "source": "STALE_CACHE_FALLBACK"
+        },
+        "degraded": true,
+        "warning": "ZalPro RADIUS Circuit Breaker is OPEN — serving cached subscriber profile.",
+        "latencyMs": 0,
+        "circuitState": "OPEN"
+      }
+    },
+    "downtimeFallback": {
+      "status": 200,
+      "durationMs": 0.77,
+      "body": {
+        "record": {
+          "subscriberId": "usr-1",
+          "username": "usman.khan",
+          "circuitId": "PK-SGD-0194",
+          "fullName": "Muhammad Usman Khan",
+          "phone": "0300-8654321",
+          "district": "Sargodha",
+          "packagePlan": "50 Mbps Fiber Unlimited",
+          "connectionStatus": "LOS_ALARM",
+          "pppoeIpAddress": "103.151.123.105",
+          "onuMacAddress": "48:57:02:A1:BF:AA",
+          "opticalRxDbm": "-38.4 dBm (LOS)",
+          "uptimeFormatted": "0m (Link Down)",
+          "currentBalancePkr": 2000,
+          "billingCycleDue": "25th of Current Month",
+          "monthlyDownloadGb": 720,
+          "lastSyncedAt": "2026-11-11T15:22:53.398Z",
+          "source": "STALE_CACHE_FALLBACK"
+        },
+        "degraded": true,
+        "warning": "ZalPro RADIUS Circuit Breaker is OPEN — serving cached subscriber profile.",
+        "latencyMs": 0,
+        "circuitState": "OPEN"
+      }
+    },
+    "circuitBreakerOpenFastFallback": {
+      "status": 200,
+      "durationMs": 0.78,
+      "body": {
+        "record": {
+          "subscriberId": "usr-1",
+          "username": "usman.khan",
+          "circuitId": "PK-SGD-0194",
+          "fullName": "Muhammad Usman Khan",
+          "phone": "0300-8654321",
+          "district": "Sargodha",
+          "packagePlan": "50 Mbps Fiber Unlimited",
+          "connectionStatus": "LOS_ALARM",
+          "pppoeIpAddress": "103.151.123.105",
+          "onuMacAddress": "48:57:02:A1:BF:AA",
+          "opticalRxDbm": "-38.4 dBm (LOS)",
+          "uptimeFormatted": "0m (Link Down)",
+          "currentBalancePkr": 2000,
+          "billingCycleDue": "25th of Current Month",
+          "monthlyDownloadGb": 720,
+          "lastSyncedAt": "2026-11-11T15:22:53.398Z",
+          "source": "STALE_CACHE_FALLBACK"
+        },
+        "degraded": true,
+        "warning": "ZalPro RADIUS Circuit Breaker is OPEN — serving cached subscriber profile.",
+        "latencyMs": 0,
+        "circuitState": "OPEN"
+      }
+    }
+  },
+  "uploadTests": {
+    "simultaneous100": {
+      "successes": 100,
+      "stats": {
+        "avg": 109.04,
+        "p50": 117.67,
+        "p90": 123.59,
+        "p95": 124.49,
+        "p99": 125.68,
+        "max": 125.68
+      }
+    },
+    "size1Mb": {
+      "status": 201,
+      "durationMs": 17.01
+    },
+    "size2Mb": {
+      "status": 201,
+      "durationMs": 24.61
+    },
+    "size5Mb": {
+      "status": 201,
+      "durationMs": 63.71
+    },
+    "oversized6Mb": {
+      "status": 413,
+      "body": {
+        "error": "File size (6 MB) exceeds the 5.00 MB maximum limit"
+      }
+    },
+    "invalidExe": {
+      "status": 415,
+      "body": {
+        "error": "Unsupported file type (application/x-msdownload / .exe). Only PNG, JPEG, and WEBP screenshots are permitted."
+      }
+    },
+    "disguisedPhpMagicBytes": {
+      "status": 415,
+      "body": {
+        "error": "File binary signature (magic bytes) does not match a valid PNG, JPEG, or WEBP image. Upload rejected."
+      }
+    },
+    "interruptedStream": {
+      "status": 400,
+      "body": {
+        "error": "Upload stream interrupted before completion (ECONNRESET / Incomplete payload)"
+      }
+    },
+    "duplicateDetection": {
+      "firstStatus": 201,
+      "secondStatus": 200,
+      "deduplicatedHeader": "true",
+      "sameFileId": true
+    }
+  },
+  "databaseIdempotency": {
+    "firstStatus": 201,
+    "secondStatus": 200,
+    "idempotentReplayHeader": "true",
+    "sameTicketId": true
+  },
+  "securityTests": {
+    "securityHeaders": {
+      "xContentTypeOptions": "nosniff",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "permissionsPolicy": "camera=(), microphone=(), geolocation=()",
+      "xPoweredBy": "OMITTED_SECURE"
+    },
+    "xssSanitization": {
+      "sanitizedSubject": "DNS Issue on Router &lt;img src=x &gt;",
+      "sanitizedDescription": "Normal text with alert(document.cookie) and &lt;/iframe&gt;",
+      "scriptTagRemoved": true,
+      "onerrorRemoved": true,
+      "javascriptProtocolRemoved": true
+    },
+    "bruteForceProtection": {
+      "eleventhAttemptStatusCode": 429,
+      "lockedOutWith429": true
+    }
+  }
+}

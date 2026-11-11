@@ -74,7 +74,7 @@
         "district": {
           "type": "string",
           "description": "Licensed PTA district",
-          "enum": ["Faisalabad", "Lahore", "Multan", "Rawalpindi", "Islamabad"],
+          "enum": ["Sargodha", "Faisalabad", "Lahore", "Multan", "Rawalpindi", "Islamabad"],
           "minLength": 2,
           "maxLength": 40
         },
@@ -189,7 +189,7 @@
         "district": {
           "type": "string",
           "description": "PTA telecom district",
-          "enum": ["Faisalabad", "Lahore", "Multan", "Rawalpindi", "Islamabad"],
+          "enum": ["Sargodha", "Faisalabad", "Lahore", "Multan", "Rawalpindi", "Islamabad"],
           "minLength": 2,
           "maxLength": 40
         },
