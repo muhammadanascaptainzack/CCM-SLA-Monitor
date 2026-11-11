@@ -125,8 +125,39 @@ export interface SargodhaCoverageZone {
   badgeBg: string;
 }
 
+export interface CustomComplaintCategoryConfig {
+  category: ComplaintCategory;
+  priority: ComplaintPriority;
+  title: string;
+  subtitle: string;
+  slaHours: string;
+  tip: string;
+  gradient: string;
+  lightBg: string;
+}
+
+export interface CustomFaqItem {
+  q: string;
+  a: string;
+}
+
 export interface PTALicenseeConfig {
-  licenseeName: string;
+  // Company Identity & Logo
+  licenseeName: string; // e.g. Citrus Pvt Ltd
+  companyShortName?: string; // e.g. Citrus
+  companyLogoUrl?: string; // Custom uploaded image data URL or external URL
+  companyLogoText?: string; // Fallback monogram letter(s), e.g. "C"
+  companyTagline?: string; // e.g. "High-Speed FTTH Fiber Broadband"
+  websiteDomain?: string; // e.g. "citrus.net.pk"
+  headOfficeAddress?: string; // e.g. "Main University Road, Sargodha, Pakistan"
+  copyrightText?: string; // e.g. "All rights reserved. Regulated by Pakistan Telecommunication Authority (PTA)"
+
+  // Public Hero Customization
+  heroTitle?: string; // e.g. "Ultra-Fast Optical Fiber Internet in"
+  heroHighlight?: string; // e.g. "District Sargodha"
+  heroDescription?: string; // Welcome subtitle on landing page
+
+  // Regulatory & Contact Details
   licenseNumber: string; // e.g. Class/Internet/11/2026/Sargodha
   licenseType: string; // District CVAS (Data & Class Value Added Services)
   registeredDistrict: DistrictName;
@@ -135,8 +166,20 @@ export interface PTALicenseeConfig {
   complianceOfficerEmail: string;
   complianceOfficerPhone: string;
   emergencyNocHelpline: string;
+
+  // Coverage Network
   coverageHeadline?: string;
   coverageZones?: SargodhaCoverageZone[];
+
+  // Complaint System & Workflow Variables
+  ticketPrefix?: string; // e.g. "PTA-SGD"
+  circuitPrefix?: string; // e.g. "PK-SGD"
+  slaTargetP1Hours?: number; // default 8
+  slaTargetP2Hours?: number; // default 24
+  slaTargetP3Hours?: number; // default 48
+  bandwidthPlans?: string[]; // Customizable subscriber packages
+  diagnosticPresets?: CustomComplaintCategoryConfig[]; // Customizable fault categories & tips
+  faqs?: CustomFaqItem[]; // Customizable public support FAQs
 }
 
 export interface PTAMonthlyReport {

@@ -1,6 +1,16 @@
 import fs from 'fs';
 import path from 'path';
-import { ComplaintTicket, User, PTALicenseeConfig, ComplaintCategory, ComplaintPriority, DistrictName, SargodhaCoverageZone } from '../types/index.js';
+import {
+  ComplaintTicket,
+  User,
+  PTALicenseeConfig,
+  ComplaintCategory,
+  ComplaintPriority,
+  DistrictName,
+  SargodhaCoverageZone,
+  CustomComplaintCategoryConfig,
+  CustomFaqItem,
+} from '../types/index.js';
 
 interface DatabaseSchema {
   config: PTALicenseeConfig;
@@ -80,8 +90,84 @@ export const DEFAULT_SARGODHA_ZONES: SargodhaCoverageZone[] = [
   },
 ];
 
-const INITIAL_CONFIG: PTALicenseeConfig = {
+export const DEFAULT_DIAGNOSTIC_PRESETS: CustomComplaintCategoryConfig[] = [
+  {
+    category: 'OFC_CUT',
+    priority: 'P1_CRITICAL',
+    title: 'Red LOS Light Blinking',
+    subtitle: 'Optical Fiber Cut / Zero Signal',
+    slaHours: '8 Hours Mandatory SLA',
+    tip: 'Check if the yellow/white fiber patch cord behind your ONT router is unplugged or sharply bent. If intact, an outdoor fiber splice team is dispatched immediately.',
+    gradient: 'from-rose-500 to-red-600',
+    lightBg: 'bg-rose-50 border-rose-200 text-rose-950',
+  },
+  {
+    category: 'SPEED_DEGRADATION',
+    priority: 'P2_MAJOR',
+    title: 'Slow Speed / High Ping',
+    subtitle: 'Bandwidth Drop or Latency Spike',
+    slaHours: '24 Hours Mandatory SLA',
+    tip: 'Our NOC checks your optical Rx power (-15 to -24 dBm ideal) and resets your PPPoE bandwidth profile on the Core BRAS.',
+    gradient: 'from-amber-500 to-orange-600',
+    lightBg: 'bg-amber-50 border-amber-200 text-amber-950',
+  },
+  {
+    category: 'FREQUENT_DISCONNECT',
+    priority: 'P2_MAJOR',
+    title: 'Frequent Disconnection',
+    subtitle: 'Link Drops Every Few Minutes',
+    slaHours: '24 Hours Mandatory SLA',
+    tip: 'Usually caused by high optical attenuation (> -27 dBm) or loose SC/APC connector. Our field lineman re-terminates the connector.',
+    gradient: 'from-purple-600 to-indigo-600',
+    lightBg: 'bg-purple-50 border-purple-200 text-purple-950',
+  },
+  {
+    category: 'CPE_ONT_FAULT',
+    priority: 'P2_MAJOR',
+    title: 'Router / ONT Hardware Fault',
+    subtitle: 'Power Adapter or Wi-Fi Issue',
+    slaHours: '24 Hours Mandatory SLA',
+    tip: 'If your router power LED is off or PON light fails to register, our field team tests the 12V power unit and optical transceiver.',
+    gradient: 'from-emerald-500 to-teal-600',
+    lightBg: 'bg-emerald-50 border-emerald-200 text-emerald-950',
+  },
+];
+
+export const DEFAULT_BANDWIDTH_PLANS: string[] = [
+  '20 Mbps Fiber Starter',
+  '30 Mbps Fiber Plus',
+  '50 Mbps Fiber Unlimited',
+  '100 Mbps Dedicated CIR Leased Line',
+];
+
+export const DEFAULT_FAQS: CustomFaqItem[] = [
+  {
+    q: 'What is our official Licensed Coverage Area?',
+    a: 'We operate licensed PTA CVAS Optical Fiber FTTH broadband across our designated district sectors with 24/7 local splicing and NOC support.',
+  },
+  {
+    q: 'How can I contact the 24/7 NOC Helpline & Support?',
+    a: 'You can call or WhatsApp our 24/7 NOC Helpline & support number or email our support desk anytime for immediate assistance.',
+  },
+  {
+    q: 'Is my complaint history private when I sign in with Gmail?',
+    a: 'Yes! Your Gmail account is strictly isolated. Customers can only see their own complaint status and nothing else.',
+  },
+];
+
+export const INITIAL_CONFIG: PTALicenseeConfig = {
   licenseeName: 'Citrus Pvt Ltd',
+  companyShortName: 'Citrus',
+  companyLogoUrl: '',
+  companyLogoText: 'C',
+  companyTagline: 'High-Speed FTTH Fiber Broadband',
+  websiteDomain: 'citrus.net.pk',
+  headOfficeAddress: 'University Road, Sargodha, Pakistan',
+  copyrightText: 'All rights reserved. Regulated by Pakistan Telecommunication Authority (PTA)',
+  heroTitle: 'Ultra-Fast Optical Fiber Internet in',
+  heroHighlight: 'District Sargodha',
+  heroDescription:
+    'Sign in with your personal Gmail account to lodge fiber complaints and track your live resolution status with 100% private cloud protection.',
   licenseNumber: 'Class/Internet/11/2026/Sargodha',
   licenseType: 'District CVAS (Class Value Added Services - Data & Internet)',
   registeredDistrict: 'Sargodha',
@@ -92,6 +178,14 @@ const INITIAL_CONFIG: PTALicenseeConfig = {
   emergencyNocHelpline: '03390480022',
   coverageHeadline: 'District Sargodha, Pakistan only',
   coverageZones: DEFAULT_SARGODHA_ZONES,
+  ticketPrefix: 'PTA-SGD',
+  circuitPrefix: 'PK-SGD',
+  slaTargetP1Hours: 8,
+  slaTargetP2Hours: 24,
+  slaTargetP3Hours: 48,
+  bandwidthPlans: DEFAULT_BANDWIDTH_PLANS,
+  diagnosticPresets: DEFAULT_DIAGNOSTIC_PRESETS,
+  faqs: DEFAULT_FAQS,
 };
 
 const INITIAL_USERS: User[] = [
@@ -534,7 +628,7 @@ class StorageManager {
         const parsed = JSON.parse(content);
         if (parsed.tickets && parsed.users && parsed.config) {
           let updated = false;
-          if (parsed.config.registeredDistrict !== 'Sargodha') {
+          if (!parsed.config.registeredDistrict) {
             parsed.config.registeredDistrict = 'Sargodha';
             updated = true;
           }
@@ -572,20 +666,47 @@ class StorageManager {
             parsed.config.coverageZones = DEFAULT_SARGODHA_ZONES;
             updated = true;
           }
+          // Backfill new white-label & complaint customization defaults if missing
+          const defaultKeys: (keyof PTALicenseeConfig)[] = [
+            'companyShortName',
+            'companyLogoUrl',
+            'companyLogoText',
+            'companyTagline',
+            'websiteDomain',
+            'headOfficeAddress',
+            'copyrightText',
+            'heroTitle',
+            'heroHighlight',
+            'heroDescription',
+            'ticketPrefix',
+            'circuitPrefix',
+            'slaTargetP1Hours',
+            'slaTargetP2Hours',
+            'slaTargetP3Hours',
+            'bandwidthPlans',
+            'diagnosticPresets',
+            'faqs',
+          ];
+          for (const key of defaultKeys) {
+            if (parsed.config[key] === undefined) {
+              (parsed.config as any)[key] = INITIAL_CONFIG[key];
+              updated = true;
+            }
+          }
           for (const u of parsed.users) {
             if (u.email === 'compliance@citrus.net.pk') {
               u.email = 'support.citrus@gmail.com';
               u.phone = parsed.config.emergencyNocHelpline || '03390480022';
               updated = true;
             }
-            if (u.district !== 'Sargodha') {
-              u.district = 'Sargodha';
+            if (!u.district) {
+              u.district = parsed.config.registeredDistrict || 'Sargodha';
               updated = true;
             }
           }
           for (const t of parsed.tickets) {
-            if (t.district !== 'Sargodha') {
-              t.district = 'Sargodha';
+            if (!t.district) {
+              t.district = parsed.config.registeredDistrict || 'Sargodha';
               updated = true;
             }
           }
@@ -710,16 +831,16 @@ class StorageManager {
 
   public calculateSlaDeadline(priority: ComplaintPriority, fromDate: Date = new Date()): Date {
     const deadline = new Date(fromDate);
-    // PTA CVAS SLA guidelines:
-    // P1 (Critical): 8 Hours
-    // P2 (Major): 24 Hours
-    // P3 (Standard): 48 Hours
+    const p1Hrs = this.data.config.slaTargetP1Hours || 8;
+    const p2Hrs = this.data.config.slaTargetP2Hours || 24;
+    const p3Hrs = this.data.config.slaTargetP3Hours || 48;
+
     if (priority === 'P1_CRITICAL') {
-      deadline.setHours(deadline.getHours() + 8);
+      deadline.setHours(deadline.getHours() + p1Hrs);
     } else if (priority === 'P2_MAJOR') {
-      deadline.setHours(deadline.getHours() + 24);
+      deadline.setHours(deadline.getHours() + p2Hrs);
     } else {
-      deadline.setHours(deadline.getHours() + 48);
+      deadline.setHours(deadline.getHours() + p3Hrs);
     }
     return deadline;
   }
@@ -741,12 +862,18 @@ class StorageManager {
 
     const now = new Date();
     const slaDeadline = this.calculateSlaDeadline(input.priority, now);
-    const district = customer.district || this.data.config.registeredDistrict;
-    
-    // Generate official ticket number e.g. PTA-FSD-2026-0045
+    const district = customer.district || this.data.config.registeredDistrict || 'Sargodha';
+
+    // Generate official ticket number using custom ticketPrefix or PTA-DIS
     const ticketSeq = (this.data.tickets.length + 1).toString().padStart(4, '0');
     const districtCode = district.substring(0, 3).toUpperCase();
-    const ticketNumber = `PTA-${districtCode}-${now.getFullYear()}-${ticketSeq}`;
+    const prefix = (this.data.config.ticketPrefix || `PTA-${districtCode}`).trim().toUpperCase();
+    const ticketNumber = `${prefix}-${now.getFullYear()}-${ticketSeq}`;
+
+    const cktPrefix = (this.data.config.circuitPrefix || `PK-${districtCode}`).trim().toUpperCase();
+    const p1Hrs = this.data.config.slaTargetP1Hours || 8;
+    const p2Hrs = this.data.config.slaTargetP2Hours || 24;
+    const p3Hrs = this.data.config.slaTargetP3Hours || 48;
 
     const newTicket: ComplaintTicket = {
       id: `tkt-${Date.now()}`,
@@ -755,7 +882,7 @@ class StorageManager {
       customerName: customer.name,
       customerPhone: customer.phone,
       customerCnic: customer.cnic,
-      circuitId: customer.circuitId || `PK-${districtCode}-GUEST`,
+      circuitId: customer.circuitId || `${cktPrefix}-GUEST`,
       district,
       tehsilArea: customer.areaAddress || 'Urban Central',
       connectionType: customer.connectionType || 'FTTH',
@@ -778,7 +905,7 @@ class StorageManager {
           action: 'Complaint Registered in CMS',
           performedBy: customer.name,
           role: 'Customer',
-          notes: `PTA Tracking Reference: ${ticketNumber}. SLA Target: ${input.priority === 'P1_CRITICAL' ? '8 Hours' : input.priority === 'P2_MAJOR' ? '24 Hours' : '48 Hours'}`
+          notes: `Official Tracking Reference: ${ticketNumber}. SLA Target: ${input.priority === 'P1_CRITICAL' ? `${p1Hrs} Hours` : input.priority === 'P2_MAJOR' ? `${p2Hrs} Hours` : `${p3Hrs} Hours`}`
         }
       ]
     };

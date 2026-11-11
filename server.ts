@@ -12,9 +12,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
 
-// Body parsers
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Body parsers (10mb limit to support admin logo image uploads)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // API routes
 app.use('/api', apiRouter);

@@ -14,7 +14,7 @@ import {
   Radio,
   Mail
 } from 'lucide-react';
-import { UserRole, User as UserType } from '../types/index.js';
+import { UserRole, User as UserType, PTALicenseeConfig } from '../types/index.js';
 
 interface HeaderProps {
   currentTab: 'dashboard' | 'tickets' | 'customer' | 'reports' | 'users' | 'server' | 'admin';
@@ -23,6 +23,7 @@ interface HeaderProps {
   activeUser: UserType | null;
   portalMode: 'customer' | 'noc' | 'admin';
   onSwitchPortal: () => void;
+  config?: PTALicenseeConfig | null;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -32,28 +33,40 @@ export const Header: React.FC<HeaderProps> = ({
   activeUser,
   portalMode,
   onSwitchPortal,
+  config,
 }) => {
   const isAdmin = activeUser?.role === 'admin';
+  const companyName = config?.licenseeName || 'Citrus Pvt Ltd';
+  const companyLogoUrl = config?.companyLogoUrl || '';
+  const companyLogoText = config?.companyLogoText || companyName.charAt(0).toUpperCase() || 'C';
 
   return (
     <header className="no-print bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4 h-16">
-          {/* Zone 1: Citrus logo + Brand Wordmark */}
+          {/* Zone 1: Custom Company Logo + Brand Wordmark */}
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => onSelectTab(portalMode === 'customer' ? 'customer' : 'dashboard')}
               className="text-left group flex items-center gap-2.5 focus-visible:outline-none cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-md ring-2 ring-orange-400/40">
-                C
-              </div>
+              {companyLogoUrl ? (
+                <img
+                  src={companyLogoUrl}
+                  alt={companyName}
+                  className="w-10 h-10 rounded-2xl object-contain bg-white border border-slate-200 p-0.5 shadow-sm"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-md ring-2 ring-orange-400/40">
+                  {companyLogoText}
+                </div>
+              )}
               <div>
                 <span className="text-xl font-black tracking-tight text-slate-950 whitespace-nowrap block">
-                  Citrus Pvt Ltd
+                  {companyName}
                 </span>
                 <span className="text-[10px] text-slate-500 font-medium hidden sm:block">
-                  {portalMode === 'customer' ? 'Customer Complaint Portal' : 'NOC & Staff Operations'}
+                  {portalMode === 'customer' ? 'Customer Complaint Portal' : (config?.companyTagline || 'NOC & Staff Operations')}
                 </span>
               </div>
             </button>

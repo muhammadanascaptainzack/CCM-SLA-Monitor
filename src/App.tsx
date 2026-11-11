@@ -105,6 +105,12 @@ export default function App() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (config?.licenseeName) {
+      document.title = `${config.licenseeName} — ${config.companyTagline || 'Complaint Management Portal'}`;
+    }
+  }, [config]);
+
   // Subscribe to customer's private Google Cloud Firestore complaint history when authenticated with Gmail
   useEffect(() => {
     if (!customerFirebaseUid) {
@@ -154,7 +160,7 @@ export default function App() {
 
   const handleAcknowledgeTicket = async (id: string) => {
     try {
-      const staffName = activeStaff ? `${activeStaff.name} (${activeStaff.role})` : 'Citrus NOC Supervisor';
+      const staffName = activeStaff ? `${activeStaff.name} (${activeStaff.role})` : `${config?.companyShortName || 'Citrus'} NOC Supervisor`;
       const updated = await acknowledgeComplaint(id, staffName);
       setTickets((prev) => prev.map((t) => (t.id === id ? updated : t)));
       setSelectedTicket(updated);
@@ -167,7 +173,7 @@ export default function App() {
 
   const handlePostOnlineUpdate = async (id: string, updateText: string) => {
     try {
-      const staffName = activeStaff ? activeStaff.name : 'Citrus NOC Operations';
+      const staffName = activeStaff ? activeStaff.name : `${config?.companyShortName || 'Citrus'} NOC Operations`;
       const updated = await postOnlineUpdate(id, updateText, staffName, 'NOC Support');
       setTickets((prev) => prev.map((t) => (t.id === id ? updated : t)));
       setSelectedTicket(updated);
@@ -371,6 +377,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 flex flex-col text-slate-900">
       {/* Top Bar Contract Header */}
       <Header
+        config={config}
         currentTab={portalSession === 'customer' ? 'customer' : currentTab}
         onSelectTab={(tab) => {
           // Strictly lock customer to their own complaint status view only
@@ -409,7 +416,7 @@ export default function App() {
         {isLoading ? (
           <div className="py-24 text-center space-y-3">
             <div className="w-8 h-8 border-2 border-emerald-700 border-t-transparent rounded-full animate-spin mx-auto" />
-            <div className="text-sm font-medium text-slate-600">Loading Citrus CMS Portal...</div>
+            <div className="text-sm font-medium text-slate-600">Loading {config?.licenseeName || 'Citrus'} CMS Portal...</div>
           </div>
         ) : portalSession === 'customer' ? (
           /* Customer can ONLY see their own complaint status view — nothing else */
@@ -546,7 +553,7 @@ export default function App() {
       <footer className="no-print bg-white border-t border-slate-200 mt-auto py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-extrabold text-slate-900">Citrus Pvt Ltd</span>
+            <span className="font-extrabold text-slate-900">{config?.licenseeName || 'Citrus Pvt Ltd'}</span>
             <span aria-hidden="true">·</span>
             <span className="font-mono font-bold text-indigo-700">{config?.licenseNumber || 'Class/Internet/11/2026/Sargodha'}</span>
             <span aria-hidden="true">·</span>
@@ -676,9 +683,9 @@ export default function App() {
                       onChange={(e) => setModalPriority(e.target.value as ComplaintPriority)}
                       className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white text-slate-900 font-medium"
                     >
-                      <option value="P1_CRITICAL">Priority 1 (Critical Outage - 8h Max)</option>
-                      <option value="P2_MAJOR">Priority 2 (Degradation - 24h Max)</option>
-                      <option value="P3_STANDARD">Priority 3 (Inquiries - 48h Max)</option>
+                      <option value="P1_CRITICAL">Priority 1 (Critical Outage - {config?.slaTargetP1Hours || 8}h Max)</option>
+                      <option value="P2_MAJOR">Priority 2 (Degradation - {config?.slaTargetP2Hours || 24}h Max)</option>
+                      <option value="P3_STANDARD">Priority 3 (Inquiries - {config?.slaTargetP3Hours || 48}h Max)</option>
                     </select>
                   </div>
                 </div>

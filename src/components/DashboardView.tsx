@@ -35,6 +35,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const activeLicense = config?.licenseNumber || report?.licensee?.licenseNumber || 'Class/Internet/11/2026/Sargodha';
   const activeHelpline = config?.emergencyNocHelpline || report?.licensee?.emergencyNocHelpline || '03390480022';
   const activeCoverage = config?.coverageHeadline || 'District Sargodha, Pakistan only';
+  const activeCompanyName = config?.licenseeName || report?.licensee?.licenseeName || 'Citrus Pvt Ltd';
+  const slaP1 = config?.slaTargetP1Hours || 8;
+  const slaP2 = config?.slaTargetP2Hours || 24;
+  const slaP3 = config?.slaTargetP3Hours || 48;
 
   const activeTickets = tickets.filter(
     (t) => t.status === 'REGISTERED' || t.status === 'ASSIGNED' || t.status === 'IN_PROGRESS'
@@ -173,7 +177,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <span className="text-xs text-slate-500">hours average</span>
           </div>
           <div className="text-xs text-slate-500 mt-2">
-            P1: 8h limit · P2: 24h · P3: 48h
+            P1: {slaP1}h limit · P2: {slaP2}h · P3: {slaP3}h
           </div>
         </div>
 
@@ -301,7 +305,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <div className="font-semibold text-slate-800">Priority 1 (Critical Outage)</div>
                   <div className="text-slate-500">Optical cable cut, exchange link down</div>
                 </div>
-                <div className="font-mono font-bold text-slate-900 text-sm">8 Hours</div>
+                <div className="font-mono font-bold text-slate-900 text-sm">{slaP1} Hours</div>
               </div>
 
               <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between">
@@ -309,7 +313,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <div className="font-semibold text-slate-800">Priority 2 (Major Degradation)</div>
                   <div className="text-slate-500">Frequent disconnect, speed throttling</div>
                 </div>
-                <div className="font-mono font-bold text-slate-900 text-sm">24 Hours</div>
+                <div className="font-mono font-bold text-slate-900 text-sm">{slaP2} Hours</div>
               </div>
 
               <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between">
@@ -317,7 +321,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <div className="font-semibold text-slate-800">Priority 3 (Standard / Inquiries)</div>
                   <div className="text-slate-500">Billing dispute, DNS inquiry, WiFi check</div>
                 </div>
-                <div className="font-mono font-bold text-slate-900 text-sm">48 Hours</div>
+                <div className="font-mono font-bold text-slate-900 text-sm">{slaP3} Hours</div>
               </div>
             </div>
           </div>
@@ -341,7 +345,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               License # {activeLicense}
             </div>
             <p className="text-xs text-emerald-200/80 mt-1">
-              Citrus Pvt Ltd · {activeCoverage}. Complaint register maintained in accordance with PTA Telecom Act 1996 & TCPR 2009.
+              {activeCompanyName} · {activeCoverage}. Complaint register maintained in accordance with PTA Telecom Act 1996 & TCPR 2009.
             </p>
             <div className="mt-4 pt-4 border-t border-emerald-800/60 flex items-center justify-between text-xs">
               <span className="text-emerald-300">24/7 NOC Helpline:</span>

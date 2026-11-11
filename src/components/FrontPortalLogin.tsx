@@ -262,10 +262,29 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
   const [isSubmittingQuickLodge, setIsSubmittingQuickLodge] = useState(false);
   const [quickLodgeSuccessTicket, setQuickLodgeSuccessTicket] = useState<ComplaintTicket | null>(null);
 
+  const activeCompanyName = config?.licenseeName || 'Citrus Pvt Ltd';
+  const activeShortName = config?.companyShortName || 'Citrus';
+  const activeLogoUrl = config?.companyLogoUrl || '';
+  const activeLogoText = config?.companyLogoText || activeCompanyName.charAt(0).toUpperCase() || 'C';
+  const activeTagline = config?.companyTagline || 'High-Speed FTTH Fiber Broadband';
+  const activeHeroTitle = config?.heroTitle || 'Ultra-Fast Optical Fiber Internet in';
+  const activeHeroHighlight = config?.heroHighlight || 'District Sargodha';
+  const activeHeroDescription =
+    config?.heroDescription ||
+    'Sign in with your personal Gmail account to lodge fiber complaints and track your live resolution status with 100% private cloud protection.';
   const activeHelpline = config?.emergencyNocHelpline || '03390480022';
   const activeEmail = config?.complianceOfficerEmail || 'support.citrus@gmail.com';
   const activeLicense = config?.licenseNumber || 'Class/Internet/11/2026/Sargodha';
   const activeCoverageHeadline = config?.coverageHeadline || 'District Sargodha, Pakistan only';
+  const activeTicketPrefix = config?.ticketPrefix || 'PTA-SGD';
+  const activePlans =
+    config?.bandwidthPlans && config.bandwidthPlans.length > 0
+      ? config.bandwidthPlans
+      : ['30 Mbps Fiber Plus', '50 Mbps Fiber Unlimited', '100 Mbps Dedicated CIR Leased Line'];
+  const activeDiagnostics =
+    config?.diagnosticPresets && config.diagnosticPresets.length > 0
+      ? config.diagnosticPresets
+      : DIAGNOSTIC_PRESETS;
   const activeZones: SargodhaZone[] =
     config?.coverageZones && config.coverageZones.length > 0
       ? config.coverageZones
@@ -551,7 +570,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             className="flex items-center gap-2 text-slate-300 hover:text-white text-xs font-bold transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 text-amber-400" />
-            <span>Back to Citrus Sargodha Homepage</span>
+            <span>Back to {activeShortName} Homepage</span>
           </button>
 
           <div className="flex items-center gap-3">
@@ -577,13 +596,21 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex items-center gap-3.5 mb-6">
-              <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 flex items-center justify-center font-black text-2xl text-slate-950 shadow-lg ring-2 ring-amber-400/50">
-                C
-              </div>
+              {activeLogoUrl ? (
+                <img
+                  src={activeLogoUrl}
+                  alt={activeCompanyName}
+                  className="w-13 h-13 rounded-2xl object-contain bg-white p-1 shadow-lg ring-2 ring-amber-400/50"
+                />
+              ) : (
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 flex items-center justify-center font-black text-2xl text-slate-950 shadow-lg ring-2 ring-amber-400/50">
+                  {activeLogoText}
+                </div>
+              )}
               <div>
                 <div className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-amber-400 mb-0.5">
                   <MapPin className="w-3 h-3" />
-                  <span>District Sargodha, Pakistan Only</span>
+                  <span>{activeCoverageHeadline}</span>
                 </div>
                 <h2 className="text-xl font-black text-white">Customer Gmail Sign-In & Registration</h2>
                 <p className="text-xs text-slate-400">
@@ -860,22 +887,24 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                       onChange={(e) => setRegPlan(e.target.value)}
                       className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs focus:outline-none"
                     >
-                      <option value="30 Mbps Fiber Plus">30 Mbps Fiber Plus</option>
-                      <option value="50 Mbps Fiber Unlimited">50 Mbps Fiber Unlimited</option>
-                      <option value="100 Mbps Dedicated CIR Leased Line">100 Mbps Dedicated CIR Leased Line</option>
+                      {activePlans.map((plan) => (
+                        <option key={plan} value={plan}>
+                          {plan}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Installation Address in Sargodha *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Installation Address *</label>
                   <input
                     type="text"
                     required
                     maxLength={250}
                     value={regAddress}
                     onChange={(e) => setRegAddress(e.target.value)}
-                    placeholder="e.g. Block C, Satellite Town / University Road, Sargodha"
+                    placeholder="e.g. Block C, Satellite Town / Main Commercial Area"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500 text-white text-xs placeholder-slate-500 focus:outline-none"
                   />
                 </div>
@@ -901,7 +930,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
         {/* Footer info */}
         <div className="text-center py-4 text-xs text-slate-400 border-t border-slate-800/80">
-          Citrus Pvt Ltd · Licensed PTA CVAS ({activeLicense}) · {activeCoverageHeadline} · 24/7 Helpline: {activeHelpline} · {activeEmail}
+          {activeCompanyName} · Licensed PTA CVAS ({activeLicense}) · {activeCoverageHeadline} · 24/7 Helpline: {activeHelpline} · {activeEmail}
         </div>
       </div>
     );
@@ -1015,16 +1044,16 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
         {/* Footer */}
         <div className="text-center py-4 text-xs text-slate-500 border-t border-slate-800">
-          Citrus Pvt Ltd Network Operations Center (NOC) · District Sargodha, Pakistan · Authorized Staff Access Only
+          {activeCompanyName} Network Operations Center (NOC) · {activeCoverageHeadline} · Authorized Staff Access Only
         </div>
       </div>
     );
   }
 
   // -------------------------------------------------------------
-  // VIEW 3: MAIN INTRODUCTION PAGE (Citrus Pvt Ltd — Vibrant & Interactive)
+  // VIEW 3: MAIN INTRODUCTION PAGE (Customizable Company Brand & Interactive)
   // -------------------------------------------------------------
-  const currentDiag = DIAGNOSTIC_PRESETS[activeDiagIndex];
+  const currentDiag = activeDiagnostics[activeDiagIndex] || activeDiagnostics[0] || DIAGNOSTIC_PRESETS[0];
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-amber-300 selection:text-slate-950">
@@ -1067,17 +1096,25 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
           <div className="flex items-center justify-between h-20 gap-4">
             {/* Logo & Company Identity */}
             <div className="flex items-center gap-3.5 shrink-0">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg ring-2 ring-orange-400/50">
-                C
-              </div>
+              {activeLogoUrl ? (
+                <img
+                  src={activeLogoUrl}
+                  alt={activeCompanyName}
+                  className="w-12 h-12 rounded-2xl object-contain bg-white border border-slate-200 p-1 shadow-md"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg ring-2 ring-orange-400/50">
+                  {activeLogoText}
+                </div>
+              )}
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-slate-950 via-slate-800 to-emerald-900 bg-clip-text text-transparent">
-                    Citrus Pvt Ltd
+                    {activeCompanyName}
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 font-semibold">
-                  High-Speed FTTH Fiber Broadband · {activeCoverageHeadline}
+                  {activeTagline} · {activeCoverageHeadline}
                 </p>
               </div>
             </div>
@@ -1104,7 +1141,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                 className="hidden md:flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-extrabold text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all cursor-pointer border border-amber-200"
               >
                 <MapPin className="w-3.5 h-3.5 text-orange-600" />
-                <span>Sargodha Coverage</span>
+                <span>Coverage Network</span>
               </button>
 
               <button
@@ -1168,15 +1205,14 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
-                Ultra-Fast Optical Fiber Internet in{' '}
+                {activeHeroTitle}{' '}
                 <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-emerald-400 bg-clip-text text-transparent">
-                  District Sargodha
+                  {activeHeroHighlight}
                 </span>
               </h1>
 
               <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
-                Welcome to <span className="font-extrabold text-white">Citrus Pvt Ltd</span>. Sign in with your personal{' '}
-                <span className="font-bold text-amber-300">Gmail account</span> to lodge fiber complaints and track your live resolution status with 100% private cloud protection.
+                Welcome to <span className="font-extrabold text-white">{activeCompanyName}</span>. {activeHeroDescription}
               </p>
 
               {/* Hero CTA Buttons */}
@@ -1304,7 +1340,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
                 {/* Symptom Selector Pills */}
                 <div className="grid grid-cols-2 gap-2.5">
-                  {DIAGNOSTIC_PRESETS.map((item, idx) => {
+                  {activeDiagnostics.map((item, idx) => {
                     const isSelected = activeDiagIndex === idx;
                     return (
                       <button
@@ -1387,8 +1423,8 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                 <span>{activeCoverageHeadline}</span>
               </div>
               <p className="text-sm text-slate-600 max-w-2xl pt-1">
-                Citrus Pvt Ltd operates dedicated 10G GPON Optical Fiber rings across{' '}
-                <strong className="text-slate-900">{activeCoverageHeadline}</strong>. Click any Sargodha sector below to inspect live OLT node health or register a complaint.
+                {activeCompanyName} operates dedicated 10G GPON Optical Fiber rings across{' '}
+                <strong className="text-slate-900">{activeCoverageHeadline}</strong>. Click any sector below to inspect live OLT node health or register a complaint.
               </p>
             </div>
 
@@ -1614,7 +1650,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
                   type="text"
                   value={trackQuery}
                   onChange={(e) => setTrackQuery(e.target.value)}
-                  placeholder="Enter Ticket # (e.g. PTA-SGD-2026-0041)"
+                  placeholder={`Enter Ticket # (e.g. ${activeTicketPrefix}-2026-0041)`}
                   className="w-full pl-10 pr-4 py-3.5 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-orange-500 text-sm font-mono uppercase text-slate-900 focus:outline-none"
                 />
                 <Search className="w-5 h-5 text-orange-500 absolute left-3.5 top-3.5" />
@@ -1682,24 +1718,27 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             <div className="flex items-center gap-2 mb-2">
               <HelpCircle className="w-5 h-5 text-orange-600" />
               <h3 className="text-lg font-black text-slate-950">
-                Sargodha Subscriber Support FAQ
+                Subscriber Support FAQ
               </h3>
             </div>
 
-            {[
-              {
-                q: 'What is the Coverage Area of Citrus Pvt Ltd?',
-                a: `Citrus Pvt Ltd is licensed under PTA CVAS (${activeLicense}) for ${activeCoverageHeadline}.`,
-              },
-              {
-                q: 'How can I contact the 24/7 NOC Helpline & Support?',
-                a: `You can call or WhatsApp our 24/7 NOC Helpline & support number at ${activeHelpline} or email us anytime at ${activeEmail}.`,
-              },
-              {
-                q: 'Is my complaint history private when I sign in with Gmail?',
-                a: 'Yes! Your Gmail account is strictly isolated. Customers can only see their own complaint status and nothing else.',
-              },
-            ].map((item, idx) => {
+            {(config?.faqs && config.faqs.length > 0
+              ? config.faqs
+              : [
+                  {
+                    q: `What is the Coverage Area of ${activeCompanyName}?`,
+                    a: `${activeCompanyName} is licensed under PTA CVAS (${activeLicense}) for ${activeCoverageHeadline}.`,
+                  },
+                  {
+                    q: 'How can I contact the 24/7 NOC Helpline & Support?',
+                    a: `You can call or WhatsApp our 24/7 NOC Helpline & support number at ${activeHelpline} or email us anytime at ${activeEmail}.`,
+                  },
+                  {
+                    q: 'Is my complaint history private when I sign in with Gmail?',
+                    a: 'Yes! Your Gmail account is strictly isolated. Customers can only see their own complaint status and nothing else.',
+                  },
+                ]
+            ).map((item, idx) => {
               const isOpen = openFaqIndex === idx;
               return (
                 <div
@@ -1730,21 +1769,34 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
         </div>
       </section>
 
-      {/* 7. FOOTER WITH UPDATED SARGODHA COVERAGE, HELPLINE, AND SUPPORT EMAIL */}
+      {/* 7. FOOTER WITH DYNAMIC BRANDING, LOGO, HELPLINE, AND SUPPORT EMAIL */}
       <footer className="bg-slate-950 text-slate-400 text-xs pt-12 pb-8 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-800">
-            {/* Col 1: Brand & Sargodha Coverage */}
+            {/* Col 1: Brand & Coverage */}
             <div className="space-y-3">
               <div className="flex items-center gap-2.5 text-white font-black text-lg">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-400 text-slate-950 flex items-center justify-center font-black text-sm shadow-md">
-                  C
-                </div>
-                <span>Citrus Pvt Ltd</span>
+                {activeLogoUrl ? (
+                  <img
+                    src={activeLogoUrl}
+                    alt={activeCompanyName}
+                    className="w-8 h-8 rounded-xl object-contain bg-white p-0.5 shadow-md"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-400 text-slate-950 flex items-center justify-center font-black text-sm shadow-md">
+                    {activeLogoText}
+                  </div>
+                )}
+                <span>{activeCompanyName}</span>
               </div>
               <p className="text-slate-400 text-xs leading-relaxed">
                 Licensed PTA CVAS District Coverage (<strong className="font-mono text-white">{activeLicense}</strong>): <strong className="text-amber-300">{activeCoverageHeadline}</strong>. Providing high-speed optical fiber FTTH internet and enterprise broadband infrastructure.
               </p>
+              {config?.headOfficeAddress && (
+                <p className="text-slate-500 text-[11px]">
+                  📍 {config.headOfficeAddress}
+                </p>
+              )}
             </div>
 
             {/* Col 2: Customer Support */}
@@ -1785,10 +1837,10 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
               <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
                 <Lock className="w-4 h-4" />
-                <span>Citrus Internal Staff & NOC Gateway</span>
+                <span>{activeShortName} Internal Staff & NOC Gateway</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                For Citrus NOC Engineers, Linemen, and Administrators in District Sargodha. Staff credentials are created by the System Administrator.
+                For {activeShortName} NOC Engineers, Linemen, and Administrators. Staff credentials are created by the System Administrator.
               </p>
               <button
                 onClick={() => setPageView('staff_auth')}
@@ -1803,7 +1855,7 @@ export const FrontPortalLogin: React.FC<FrontPortalLoginProps> = ({
 
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-[11px]">
             <div>
-              © 2026 Citrus Pvt Ltd. All rights reserved. Regulated by Pakistan Telecommunication Authority (PTA) · License #{activeLicense}.
+              © 2026 {activeCompanyName}. {config?.copyrightText || 'All rights reserved. Regulated by Pakistan Telecommunication Authority (PTA)'} · License #{activeLicense}.
             </div>
             <div className="text-amber-400/90 font-bold">
               Licensed PTA CVAS District Coverage: {activeCoverageHeadline}

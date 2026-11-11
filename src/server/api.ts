@@ -69,6 +69,9 @@ apiRouter.post('/users', (req: Request, res: Response) => {
     return res.status(400).json({ error: 'A user with this email is already registered' });
   }
 
+  const config = storage.getConfig();
+  const cktPrefix = (config.circuitPrefix || `PK-${(district || config.registeredDistrict || 'SGD').substring(0, 3).toUpperCase()}`).trim().toUpperCase();
+
   const newUser = storage.createUser({
     name,
     email,
@@ -76,11 +79,11 @@ apiRouter.post('/users', (req: Request, res: Response) => {
     cnic,
     role: role || 'customer',
     password: password || 'citrus123',
-    circuitId: circuitId || (role === 'customer' ? `PK-${(district || 'SGD').substring(0,3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}` : undefined),
-    district: district || 'Sargodha',
+    circuitId: circuitId || (role === 'customer' ? `${cktPrefix}-${Math.floor(1000 + Math.random() * 9000)}` : undefined),
+    district: district || config.registeredDistrict || 'Sargodha',
     areaAddress,
     connectionType: connectionType || 'FTTH',
-    bandwidthPlan: bandwidthPlan || '30 Mbps Standard Fiber',
+    bandwidthPlan: bandwidthPlan || (config.bandwidthPlans?.[0] || '30 Mbps Standard Fiber'),
     status: status || 'active'
   });
 

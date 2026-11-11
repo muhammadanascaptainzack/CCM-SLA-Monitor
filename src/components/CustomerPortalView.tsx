@@ -195,7 +195,7 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
             <div>
               <span className="text-slate-400 block">Licensed Coverage</span>
               <span className="text-amber-300 font-semibold">
-                District Sargodha, Pakistan · {activeCustomer.areaAddress || 'Sargodha'}
+                {activeCoverage} · {activeCustomer.areaAddress || config?.registeredDistrict || 'Sargodha'}
               </span>
             </div>
             <div>
@@ -288,9 +288,9 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
                     onChange={(e) => setPriority(e.target.value as ComplaintPriority)}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white text-slate-900"
                   >
-                    <option value="P1_CRITICAL">Priority 1 (Critical Outage - 8 Hours Target)</option>
-                    <option value="P2_MAJOR">Priority 2 (Major Degradation - 24 Hours Target)</option>
-                    <option value="P3_STANDARD">Priority 3 (Standard / Billing - 48 Hours Target)</option>
+                    <option value="P1_CRITICAL">Priority 1 (Critical Outage - {config?.slaTargetP1Hours || 8} Hours Target)</option>
+                    <option value="P2_MAJOR">Priority 2 (Major Degradation - {config?.slaTargetP2Hours || 24} Hours Target)</option>
+                    <option value="P3_STANDARD">Priority 3 (Standard / Billing - {config?.slaTargetP3Hours || 48} Hours Target)</option>
                   </select>
                 </div>
               </div>
